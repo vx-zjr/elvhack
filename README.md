@@ -31,7 +31,7 @@ are Markdown files under `src/content/post`.
 Current canonical fallback:
 
 ```text
-https://elvhack.pages.dev
+https://elvhack.vx-zjr-v.workers.dev
 ```
 
 When the custom domain is ready, set `SITE_URL=https://elvhack.com` in

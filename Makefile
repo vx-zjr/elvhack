@@ -23,7 +23,7 @@ lint: ## Lint Markdown content and docs
 	npm run lint:md
 
 linkcheck: ## Check local Markdown links with lychee
-	lychee --no-progress --exclude '^https://(elvhack\.pages\.dev|elvhack\.com)' "src/content/**/*.md" "docs/**/*.md" README.md AGENTS.md
+	lychee --no-progress --exclude '^https://(elvhack\.vx-zjr-v\.workers\.dev|elvhack\.com)' "src/content/**/*.md" "docs/**/*.md" README.md AGENTS.md
 
 test: ## Run unit tests
 	npm test

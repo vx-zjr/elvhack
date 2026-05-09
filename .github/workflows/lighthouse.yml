@@ -13,6 +13,6 @@ jobs:
       - uses: treosh/lighthouse-ci-action@v12
         with:
           urls: |
-            https://elvhack.pages.dev
+            https://elvhack.vx-zjr-v.workers.dev
           temporaryPublicStorage: true
           uploadArtifacts: true

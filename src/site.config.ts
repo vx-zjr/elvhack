@@ -2,7 +2,7 @@ import type { AstroExpressiveCodeOptions } from "astro-expressive-code";
 import type { SiteConfig } from "@/types";
 
 export const siteConfig: SiteConfig = {
-	url: process.env.SITE_URL ?? "https://elvhack.pages.dev",
+	url: process.env.SITE_URL ?? "https://elvhack.vx-zjr-v.workers.dev",
 	title: "elvhack",
 	author: "elvhack",
 	description: "A restrained personal blog surfaced through shader systems and long-form notes.",

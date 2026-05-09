@@ -46,7 +46,7 @@ When `elvhack.com` is ready:
 4. Add production variable `SITE_URL=https://elvhack.com`.
 5. Trigger a redeploy from the latest `main`.
 6. Confirm canonical links and RSS use `https://elvhack.com`.
-7. Keep `https://elvhack.pages.dev` as the fallback URL.
+7. Keep `https://elvhack.vx-zjr-v.workers.dev` as the fallback URL.
 
 ## Security Cleanup
 
