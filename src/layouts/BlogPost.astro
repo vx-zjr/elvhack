@@ -4,35 +4,82 @@ import { type CollectionEntry, render } from "astro:content";
 import Masthead from "@/components/blog/Masthead.astro";
 import TOC from "@/components/blog/TOC.astro";
 import WebMentions from "@/components/blog/webmentions/index.astro";
+import {
+	findTranslation,
+	getAllPosts,
+	getAlternateLang,
+	getCategoryUrl,
+	getPostUrl,
+	languageMeta,
+} from "@/data/post";
 
 import BaseLayout from "./Base.astro";
 
 interface Props {
+	noindex?: boolean;
 	post: CollectionEntry<"post">;
 }
 
-const { post } = Astro.props;
+const { noindex = false, post } = Astro.props;
 const { ogImage, title, description, updatedDate, publishDate } = post.data;
 const socialImage = ogImage ?? `/og-image/${post.id}.png`;
 const articleDate = updatedDate?.toISOString() ?? publishDate.toISOString();
 const { headings, remarkPluginFrontmatter } = await render(post);
 const readingTime: string = remarkPluginFrontmatter.readingTime;
+const allPosts = await getAllPosts();
+const targetLang = getAlternateLang(post.data.lang);
+const translation = findTranslation(post, allPosts, targetLang);
+const translationHref = translation
+	? getPostUrl(translation)
+	: getCategoryUrl(targetLang, post.data.category);
+const translationLabel = post.data.lang === "zh" ? "English" : "中文";
+const translationFallback = post.data.lang === "zh" ? "English version pending" : "中文版暂缺";
+const alternateLinks = [
+	{ href: getPostUrl(post), hreflang: languageMeta[post.data.lang].htmlLang },
+	...(translation
+		? [{ href: getPostUrl(translation), hreflang: languageMeta[translation.data.lang].htmlLang }]
+		: []),
+];
 ---
 
 <BaseLayout
 	meta={{
+		alternateLinks,
 		articleDate,
+		canonical: getPostUrl(post),
 		description,
+		lang: post.data.lang,
+		noindex,
 		ogImage: socialImage,
+		rssHref: `/${post.data.lang}/rss.xml`,
 		title,
 	}}
 >
 	<article class="grow break-words" data-pagefind-body>
-		<div id="blog-hero" class="mb-12"><Masthead content={post} readingTime={readingTime} /></div>
+		<div id="blog-hero" class="mb-12">
+			<Masthead content={post} readingTime={readingTime} />
+			<div class="mt-5 border-t border-faint pt-4 text-xs text-muted">
+				{
+					translation ? (
+						<a class="cactus-link" href={translationHref}>
+							{translationLabel}
+						</a>
+					) : (
+						<>
+							<span>{translationFallback}</span>
+							<span aria-hidden="true"> / </span>
+							<a class="cactus-link" href={translationHref}>
+								{translationLabel}
+							</a>
+						</>
+					)
+				}
+			</div>
+		</div>
 		<div class="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between">
 			{!!headings.length && <TOC headings={headings} />}
 			<div
-				class="prose prose-sm prose-headings:font-semibold prose-headings:text-accent-2 prose-headings:before:absolute prose-headings:before:-ms-4 prose-headings:before:text-muted prose-headings:hover:before:text-accent sm:prose-headings:before:content-['#'] sm:prose-th:before:content-none"
+				class="prose prose-sm max-w-full prose-headings:font-semibold prose-headings:text-accent-2 prose-headings:before:absolute prose-headings:before:-ms-4 prose-headings:before:text-muted prose-headings:hover:before:text-accent prose-pre:overflow-x-auto prose-table:block prose-table:overflow-x-auto sm:prose-headings:before:content-['#'] sm:prose-th:before:content-none"
 			>
 				<slot />
 				<WebMentions />

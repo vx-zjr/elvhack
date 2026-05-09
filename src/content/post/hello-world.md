@@ -2,6 +2,10 @@
 title: "Hello World"
 description: "A first placeholder note for elvhack."
 publishDate: "2026-05-09"
+lang: "en"
+category: "technology"
+translationKey: "hello-world"
+slug: "hello-world"
 tags: ["intro"]
 draft: false
 ---

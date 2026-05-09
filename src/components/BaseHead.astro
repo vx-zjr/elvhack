@@ -1,5 +1,6 @@
 ---
 import { WEBMENTION_PINGBACK, WEBMENTION_URL } from "astro:env/client";
+import { languageMeta } from "@/data/post";
 import { siteConfig } from "@/site.config";
 import type { SiteMeta } from "@/types";
 import "@fontsource-variable/eb-garamond";
@@ -8,12 +9,24 @@ import "@/styles/global.css";
 
 type Props = SiteMeta;
 
-const { articleDate, description, ogImage, title } = Astro.props;
+const {
+	alternateLinks = [],
+	articleDate,
+	canonical,
+	description,
+	lang,
+	noindex = false,
+	ogImage,
+	ogLocale,
+	rssHref = "/rss.xml",
+	title,
+} = Astro.props;
 
 const titleSeparator = "•";
 const siteTitle = `${title} ${titleSeparator} ${siteConfig.title}`;
-const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const canonicalURL = new URL(canonical ?? Astro.url.pathname, Astro.site);
 const socialImageURL = new URL(ogImage ? ogImage : "/social-card.png", Astro.site).href;
+const locale = ogLocale ?? (lang ? languageMeta[lang].locale : siteConfig.ogLocale);
 ---
 
 <meta charset="utf-8" />
@@ -36,6 +49,21 @@ const socialImageURL = new URL(ogImage ? ogImage : "/social-card.png", Astro.sit
 
 {/* Canonical URL */}
 <link href={canonicalURL} rel="canonical" />
+{
+	alternateLinks.map((alternate) => (
+		<link
+			href={new URL(alternate.href, Astro.site)}
+			hreflang={alternate.hreflang}
+			rel="alternate"
+		/>
+	))
+}
+{
+	alternateLinks.length > 0 && (
+		<link href={canonicalURL} hreflang="x-default" rel="alternate" />
+	)
+}
+{noindex && <meta content="noindex, follow" name="robots" />}
 
 {/* Primary Meta Tags */}
 <meta content={siteTitle} name="title" />
@@ -48,7 +76,9 @@ const socialImageURL = new URL(ogImage ? ogImage : "/social-card.png", Astro.sit
 <meta content={description} property="og:description" />
 <meta content={canonicalURL} property="og:url" />
 <meta content={siteConfig.title} property="og:site_name" />
-<meta content={siteConfig.ogLocale} property="og:locale" />
+<meta content={locale} property="og:locale" />
+{lang === "zh" && <meta content={languageMeta.en.locale} property="og:locale:alternate" />}
+{lang === "en" && <meta content={languageMeta.zh.locale} property="og:locale:alternate" />}
 <meta content={socialImageURL} property="og:image" />
 <meta content="1200" property="og:image:width" />
 <meta content="630" property="og:image:height" />
@@ -72,7 +102,7 @@ const socialImageURL = new URL(ogImage ? ogImage : "/social-card.png", Astro.sit
 <link href="/sitemap-index.xml" rel="sitemap" />
 
 {/* RSS auto-discovery */}
-<link href="/rss.xml" title="Blog" rel="alternate" type="application/rss+xml" />
+<link href={rssHref} title="Blog" rel="alternate" type="application/rss+xml" />
 
 {/* Webmentions */}
 {

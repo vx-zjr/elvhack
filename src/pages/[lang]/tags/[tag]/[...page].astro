@@ -1,0 +1,104 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { render } from "astro:content";
+import type { GetStaticPaths, InferGetStaticPropsType, Page } from "astro";
+import { Icon } from "astro-icon/components";
+import PostPreview from "@/components/blog/PostPreview.astro";
+import Pagination from "@/components/Paginator.astro";
+import {
+	getPostsByLang,
+	getTagMeta,
+	getUniqueTags,
+	languageMeta,
+	POST_LANGS,
+	type PostLang,
+} from "@/data/post";
+import PageLayout from "@/layouts/Base.astro";
+import { collectionDateSort } from "@/utils/date";
+
+export const getStaticPaths = (async ({ paginate }) => {
+	const paths = [];
+
+	for (const lang of POST_LANGS) {
+		const posts = (await getPostsByLang(lang)).sort(collectionDateSort);
+		const tags = getUniqueTags(posts);
+
+		for (const tag of tags) {
+			const postsWithTag = posts.filter((post) => post.data.tags.includes(tag));
+			paths.push(
+				...paginate(postsWithTag, {
+					pageSize: 10,
+					params: { lang, tag },
+					props: { lang },
+				}),
+			);
+		}
+	}
+
+	return paths;
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths> & {
+	page: Page<CollectionEntry<"post">>;
+};
+
+const { page, lang } = Astro.props as Props;
+const { tag } = Astro.params;
+const currentLang = lang as PostLang;
+const tagMeta = await getTagMeta(tag);
+const TagContent = tagMeta ? (await render(tagMeta)).Content : null;
+const title = tagMeta?.data.title ?? `Posts about ${tag}`;
+const paginationProps = {
+	...(page.url.prev && {
+		prevUrl: {
+			text: "← Previous Tags",
+			url: page.url.prev,
+		},
+	}),
+	...(page.url.next && {
+		nextUrl: {
+			text: "Next Tags →",
+			url: page.url.next,
+		},
+	}),
+};
+---
+
+<PageLayout
+	meta={{
+		alternateLinks: [
+			{ href: `/zh/tags/${tag}/`, hreflang: languageMeta.zh.htmlLang },
+			{ href: `/en/tags/${tag}/`, hreflang: languageMeta.en.htmlLang },
+		],
+		canonical: `/${currentLang}/tags/${tag}/`,
+		description: tagMeta?.data.description ?? `View all posts with the tag - ${tag}`,
+		lang: currentLang,
+		rssHref: `/${currentLang}/rss.xml`,
+		title,
+	}}
+>
+	<nav class="mb-8" aria-label="Breadcrumbs">
+		<ul class="flex items-center">
+			<li class="flex items-center">
+				<a class="text-accent" href={`/${currentLang}/tags/`}>Tags</a>
+				<Icon aria-hidden="true" name="mdi:chevron-right" class="mx-1.5" />
+			</li>
+			<li aria-current="page"><span aria-hidden="true">#</span>{tag}</li>
+		</ul>
+	</nav>
+	<h1 class="title capitalize">{title}</h1>
+	<div class="prose prose-sm prose-cactus mb-16 max-w-none">
+		{tagMeta?.data.description && <p>{tagMeta.data.description}</p>}
+		{TagContent && <TagContent />}
+	</div>
+	<ul class="space-y-4">
+		{
+			page.data.map((post) => (
+				<li class="grid gap-1 sm:grid-cols-[auto_1fr]">
+					<PostPreview as="h2" post={post} />
+				</li>
+			))
+		}
+	</ul>
+	<Pagination {...paginationProps} />
+</PageLayout>

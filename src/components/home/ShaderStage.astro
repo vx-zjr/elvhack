@@ -1,38 +1,69 @@
 ---
-import DiagColumn from "@/components/home/DiagColumn.astro";
-import Dock from "@/components/home/Dock.astro";
-import Menubar from "@/components/home/Menubar.astro";
-import TitleCard from "@/components/home/TitleCard.astro";
 import "@/styles/shader-stage.css";
 ---
 
-<canvas id="bg"></canvas>
-<div class="grain" aria-hidden="true"></div>
-<div class="crosshairs" aria-hidden="true">
-	<span class="tl"></span><span class="tr"></span>
-	<span class="bl"></span><span class="br"></span>
-</div>
-
-<Menubar />
-
-<div class="ui prompt">
-	<span class="acc">~/elvhack/surfaces</span>
-	<span style="color:var(--dim)"> $ </span>
-	<span>render </span><span class="acc" id="prompt-name">aurora</span>
-	<span style="color:var(--dim)"> --interactive</span>
-	<span class="cursor"></span>
-</div>
-
-<TitleCard />
-
-<div class="ui hint" id="hint">
-	move <span style="color:var(--faint)">/</span> drag
-	<span class="acc">·</span>
-	keys <span class="acc">1 — 5</span>
-</div>
-
-<Dock />
-<DiagColumn />
+<main class="portal" aria-label="elvhack category portals">
+	<canvas id="bg" aria-hidden="true"></canvas>
+	<div class="grain" aria-hidden="true"></div>
+	<nav class="portal-viewport" aria-label="Blog categories">
+		<div class="portal-track">
+			<section class="portal-panel portal-panel--quant is-active" data-panel="quant">
+				<a
+					aria-label="Enter QUANT"
+					class="portal-link"
+					data-entry="quant"
+					href="/zh/quant/"
+				>
+					<span class="portal-brand" aria-hidden="true">
+						<span>E</span><span>L</span><span>V</span><span>H</span><span>A</span><span>C</span><span>K</span>
+					</span>
+					<span class="portal-title" data-text="QUANT">
+						<span class="portal-title__ghost" aria-hidden="true">QUANT</span>
+						<span class="portal-title__main" aria-hidden="true">
+							<span class="portal-letter" data-roll="0"><span class="portal-letter__glyph">Q</span></span>
+							<span class="portal-letter" data-roll="1"><span class="portal-letter__glyph">U</span></span>
+							<span class="portal-letter" data-roll="2"><span class="portal-letter__glyph">A</span></span>
+							<span class="portal-letter" data-roll="3"><span class="portal-letter__glyph">N</span></span>
+							<span class="portal-letter" data-roll="4"><span class="portal-letter__glyph">T</span></span>
+						</span>
+						<span class="portal-title__scan" aria-hidden="true">QUANT</span>
+					</span>
+				</a>
+				<span class="portal-hint" aria-hidden="true">
+					<span class="portal-hint__zh">向下滑</span>
+					<span class="portal-hint__en">SCROLL DOWN</span>
+				</span>
+			</section>
+			<section class="portal-panel portal-panel--technology" data-panel="technology" aria-hidden="true">
+				<a
+					aria-label="Enter TECH"
+					class="portal-link"
+					data-entry="technology"
+					href="/zh/technology/"
+					tabindex="-1"
+				>
+					<span class="portal-brand" aria-hidden="true">
+						<span>E</span><span>L</span><span>V</span><span>H</span><span>A</span><span>C</span><span>K</span>
+					</span>
+					<span class="portal-title" data-text="TECH">
+						<span class="portal-title__ghost" aria-hidden="true">TECH</span>
+						<span class="portal-title__main" aria-hidden="true">
+							<span class="portal-letter" data-roll="5"><span class="portal-letter__glyph">T</span></span>
+							<span class="portal-letter" data-roll="6"><span class="portal-letter__glyph">E</span></span>
+							<span class="portal-letter" data-roll="7"><span class="portal-letter__glyph">C</span></span>
+							<span class="portal-letter" data-roll="8"><span class="portal-letter__glyph">H</span></span>
+						</span>
+						<span class="portal-title__scan" aria-hidden="true">TECH</span>
+					</span>
+				</a>
+				<span class="portal-hint" aria-hidden="true">
+					<span class="portal-hint__zh">向上滑</span>
+					<span class="portal-hint__en">SCROLL UP</span>
+				</span>
+			</section>
+		</div>
+	</nav>
+</main>
 
 <script>
 	import "@/scripts/shader-stage";

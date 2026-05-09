@@ -24,7 +24,7 @@ Source of truth: `src/styles/global.css`.
 }
 ```
 
-The cyan accent is the signal line: system state, active shader, and quiet
+The cyan accent is the signal line: portal focus, active navigation, and quiet
 links. The background is cool black without becoming pure black, and foreground
 text stays warm to keep long reading comfortable.
 

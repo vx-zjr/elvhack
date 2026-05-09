@@ -16,6 +16,7 @@ const post = defineCollection({
 	loader: glob({ base: "./src/content/post", pattern: "**/*.{md,mdx}" }),
 	schema: ({ image }) =>
 		baseSchema.extend({
+			category: z.enum(["quant", "technology"]),
 			description: z.string().optional().default(""),
 			coverImage: z
 				.object({
@@ -24,8 +25,11 @@ const post = defineCollection({
 				})
 				.optional(),
 			draft: z.boolean().default(false),
+			lang: z.enum(["zh", "en"]),
 			ogImage: z.string().optional(),
+			slug: z.string().min(1),
 			tags: z.array(z.string()).default([]).transform(removeDupsAndLowerCase),
+			translationKey: z.string().min(1),
 			publishDate: z
 				.string()
 				.or(z.date())
