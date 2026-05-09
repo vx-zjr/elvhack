@@ -1,0 +1,4 @@
+dist/** linguist-vendored
+forks/** linguist-vendored
+public/icons/** linguist-generated
+package-lock.json linguist-generated
