@@ -1,0 +1,39 @@
+---
+import DiagColumn from "@/components/home/DiagColumn.astro";
+import Dock from "@/components/home/Dock.astro";
+import Menubar from "@/components/home/Menubar.astro";
+import TitleCard from "@/components/home/TitleCard.astro";
+import "@/styles/shader-stage.css";
+---
+
+<canvas id="bg"></canvas>
+<div class="grain" aria-hidden="true"></div>
+<div class="crosshairs" aria-hidden="true">
+	<span class="tl"></span><span class="tr"></span>
+	<span class="bl"></span><span class="br"></span>
+</div>
+
+<Menubar />
+
+<div class="ui prompt">
+	<span class="acc">~/elvhack/surfaces</span>
+	<span style="color:var(--dim)"> $ </span>
+	<span>render </span><span class="acc" id="prompt-name">aurora</span>
+	<span style="color:var(--dim)"> --interactive</span>
+	<span class="cursor"></span>
+</div>
+
+<TitleCard />
+
+<div class="ui hint" id="hint">
+	move <span style="color:var(--faint)">/</span> drag
+	<span class="acc">·</span>
+	keys <span class="acc">1 — 5</span>
+</div>
+
+<Dock />
+<DiagColumn />
+
+<script>
+	import "@/scripts/shader-stage";
+</script>

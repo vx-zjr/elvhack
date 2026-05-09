@@ -1,0 +1,19 @@
+---
+import BaseHead from "@/components/BaseHead.astro";
+import ShaderStage from "@/components/home/ShaderStage.astro";
+import { siteConfig } from "@/site.config";
+
+const meta = {
+	description: siteConfig.description,
+	title: "Home",
+};
+---
+
+<html data-theme="dark" lang={siteConfig.lang}>
+	<head>
+		<BaseHead {...meta} />
+	</head>
+	<body>
+		<ShaderStage />
+	</body>
+</html>
