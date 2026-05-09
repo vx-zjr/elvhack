@@ -1,5 +1,19 @@
 ---
-import { menuLinks, siteConfig } from "@/site.config";
+import { detectPreferredLang, getCategoryUrl, type PostLang } from "@/data/post";
+import { siteConfig } from "@/site.config";
+
+interface Props {
+	lang?: PostLang | undefined;
+}
+
+const currentLang = Astro.props.lang ?? detectPreferredLang(Astro.url.pathname.split("/")[1]);
+const otherLang = currentLang === "zh" ? "en" : "zh";
+const links = [
+	{ path: "/", title: "home" },
+	{ path: getCategoryUrl(currentLang, "quant"), title: "quant" },
+	{ path: getCategoryUrl(currentLang, "technology"), title: "technology" },
+	{ path: getCategoryUrl(otherLang, "technology"), title: otherLang },
+];
 ---
 
 <header class="mb-20 flex items-baseline justify-between gap-6 border-b border-faint pb-5">
@@ -15,7 +29,7 @@ import { menuLinks, siteConfig } from "@/site.config";
 		class="flex flex-wrap items-center justify-end gap-x-5 gap-y-2 text-[11px] tracking-[0.18em] text-muted uppercase"
 	>
 		{
-			menuLinks.map((link) => (
+			links.map((link) => (
 				<a
 					aria-current={Astro.url.pathname === link.path ? "page" : false}
 					class="hover:text-global-text aria-current:text-accent"

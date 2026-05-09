@@ -6,7 +6,10 @@ const allPosts = await getAllPosts();
 const allTags = getUniqueTagsWithCount(allPosts);
 
 const meta = {
+	canonical: "/en/tags/",
 	description: "A list of all the topics I've written about in my posts",
+	lang: "en" as const,
+	noindex: true,
 	title: "All Tags",
 };
 ---
@@ -19,7 +22,7 @@ const meta = {
 				<li class="flex items-center gap-x-2">
 					<a
 						class="cactus-link inline-block"
-						href={`/tags/${tag}/`}
+						href={`/en/tags/${tag}/`}
 						title={`View posts with the tag: ${tag}`}
 					>
 						&#35;{tag}

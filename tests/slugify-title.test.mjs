@@ -28,3 +28,50 @@ test("new-post writes real newlines in frontmatter", () => {
 		if (existsSync(target)) rmSync(target);
 	}
 });
+
+test("new-post writes bilingual routing frontmatter", () => {
+	const target = "src/content/post/ce-shi-yi-xia.md";
+	if (existsSync(target)) rmSync(target);
+
+	try {
+		execFileSync("bash", ["scripts/new-post.sh", "测试一下"], { stdio: "pipe" });
+		const body = readFileSync(target, "utf8");
+
+		assert.match(body, /^---\ntitle: "测试一下"\n/);
+		assert.match(body, /\nlang: "zh"\n/);
+		assert.match(body, /\ncategory: "technology"\n/);
+		assert.match(body, /\ntranslationKey: "ce-shi-yi-xia"\n/);
+		assert.match(body, /\nslug: "ce-shi-yi-xia"\n/);
+		assert.match(body, /\ntags: \[\]\n/);
+		assert.match(body, /\ndraft: true\n/);
+	} finally {
+		if (existsSync(target)) rmSync(target);
+	}
+});
+
+test("new-post supports explicit language category translation key and slug", () => {
+	const target = "src/content/post/custom-english-slug.md";
+	if (existsSync(target)) rmSync(target);
+
+	try {
+		execFileSync("bash", ["scripts/new-post.sh", "English Title"], {
+			env: {
+				...process.env,
+				category: "quant",
+				lang: "en",
+				slug: "custom-english-slug",
+				translationKey: "paired-note",
+			},
+			stdio: "pipe",
+		});
+		const body = readFileSync(target, "utf8");
+
+		assert.match(body, /^---\ntitle: "English Title"\n/);
+		assert.match(body, /\nlang: "en"\n/);
+		assert.match(body, /\ncategory: "quant"\n/);
+		assert.match(body, /\ntranslationKey: "paired-note"\n/);
+		assert.match(body, /\nslug: "custom-english-slug"\n/);
+	} finally {
+		if (existsSync(target)) rmSync(target);
+	}
+});

@@ -1,19 +1,17 @@
 ---
-import type { CollectionEntry } from "astro:content";
-import type { GetStaticPaths, Page } from "astro";
+import type { GetStaticPaths } from "astro";
 import { Icon } from "astro-icon/components";
 import PostPreview from "@/components/blog/PostPreview.astro";
 import Pagination from "@/components/Paginator.astro";
-import { getAllPosts, getUniqueTags, groupPostsByYear } from "@/data/post";
+import { getAllPosts, getUniqueTags, groupPostsByYear, sortPostsByDate } from "@/data/post";
 import PageLayout from "@/layouts/Base.astro";
-import { collectionDateSort } from "@/utils/date";
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const MAX_POSTS_PER_PAGE = 10;
 	const MAX_TAGS = 7;
 	const MAX_PINNED_POSTS = 3;
 	const allPosts = await getAllPosts();
-	const allPostsByDate = allPosts.sort(collectionDateSort);
+	const allPostsByDate = sortPostsByDate(allPosts);
 	const uniqueTags = getUniqueTags(allPosts).slice(0, MAX_TAGS);
 	const pinnedPosts = allPostsByDate
 		.values()
@@ -26,16 +24,13 @@ export const getStaticPaths = (async ({ paginate }) => {
 	});
 }) satisfies GetStaticPaths;
 
-interface Props {
-	page: Page<CollectionEntry<"post">>;
-	uniqueTags: string[];
-	pinnedPosts: CollectionEntry<"post">[];
-}
-
 const { page, uniqueTags, pinnedPosts } = Astro.props;
 
 const meta = {
+	canonical: "/en/technology/",
 	description: "Read elvhack posts.",
+	lang: "en" as const,
+	noindex: true,
 	title: "Posts",
 };
 

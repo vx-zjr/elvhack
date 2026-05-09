@@ -1,12 +1,18 @@
 # elvhack
 
-Personal blog built on Astro Cactus, with a shader surface as the home page.
+Personal blog built on Astro Cactus, with a minimal shader portal as the home page.
 
 ```text
 /
-├─ shader home
+├─ QUANT / TECHNOLOGY portal
+├─ /zh/quant
+├─ /en/quant
+├─ /zh/technology
+├─ /en/technology
+├─ /<lang>/<category>/<slug>
+│  └─ canonical markdown posts
 ├─ /posts
-│  └─ markdown posts
+│  └─ compatibility listing
 └─ /about
    └─ quiet placeholder
 ```
@@ -16,12 +22,20 @@ Personal blog built on Astro Cactus, with a shader surface as the home page.
 ```bash
 make install
 make dev
-make new-post title="测试一下"
+make new-post title="测试一下" lang=zh category=technology
 make build
 ```
 
 The home page is a static Astro page with a bundled vanilla WebGL runtime. Posts
-are Markdown files under `src/content/post`.
+are Markdown files under `src/content/post` with explicit `lang`, `category`,
+`translationKey`, and `slug` frontmatter.
+
+Create paired Chinese and English posts with the same `translationKey`:
+
+```bash
+make new-post title="量化示例" lang=zh category=quant translationKey=quant-example slug=liang-hua-shi-li
+make new-post title="Quant Example" lang=en category=quant translationKey=quant-example slug=quant-example
+```
 
 ## Deployment
 

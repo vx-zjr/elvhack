@@ -2,6 +2,10 @@
 title: "Hello pipeline"
 description: "End-to-end smoke test of the publish flow."
 publishDate: "2026-05-09"
+lang: "en"
+category: "technology"
+translationKey: "hello-pipeline"
+slug: "hello-pipeline"
 tags: ["meta"]
 draft: false
 ---

@@ -15,9 +15,9 @@ build: ## Build the static site
 preview: ## Preview the built site
 	npm run preview
 
-new-post: ## Create a draft post: make new-post title="Post title"
+new-post: ## Create a draft post: make new-post title="Post title" [lang=zh|en] [category=quant|technology] [translationKey=key] [slug=post-slug]
 	@test -n "$(title)" || (echo 'usage: make new-post title="Post title"' >&2; exit 1)
-	bash scripts/new-post.sh "$(title)"
+	lang="$(lang)" category="$(category)" translationKey="$(translationKey)" slug="$(slug)" bash scripts/new-post.sh "$(title)"
 
 lint: ## Lint Markdown content and docs
 	npm run lint:md

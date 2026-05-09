@@ -1,0 +1,62 @@
+---
+import type { GetStaticPaths, InferGetStaticPropsType } from "astro";
+import {
+	getCategoryUrl,
+	getPostsByLang,
+	getUniqueTagsWithCount,
+	languageMeta,
+	POST_LANGS,
+	type PostLang,
+} from "@/data/post";
+import PageLayout from "@/layouts/Base.astro";
+
+export const getStaticPaths = (() => {
+	return POST_LANGS.map((lang) => ({
+		params: { lang },
+		props: { lang },
+	}));
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { lang } = Astro.props as Props;
+const currentLang = lang as PostLang;
+const posts = await getPostsByLang(currentLang);
+const tags = getUniqueTagsWithCount(posts);
+const title = currentLang === "zh" ? "标签" : "Tags";
+---
+
+<PageLayout
+	meta={{
+		alternateLinks: [
+			{ href: "/zh/tags/", hreflang: languageMeta.zh.htmlLang },
+			{ href: "/en/tags/", hreflang: languageMeta.en.htmlLang },
+		],
+		canonical: `/${currentLang}/tags/`,
+		description: currentLang === "zh" ? "按标签浏览中文文章。" : "Browse English posts by tag.",
+		lang: currentLang,
+		rssHref: `/${currentLang}/rss.xml`,
+		title,
+	}}
+>
+	<nav class="mb-8 text-[11px] tracking-[0.18em] text-muted uppercase" aria-label="Breadcrumbs">
+		<a class="hover:text-global-text" href={getCategoryUrl(currentLang, "technology")}>
+			technology
+		</a>
+	</nav>
+	<h1 class="title mb-6">{title}</h1>
+	<ul class="space-y-4">
+		{
+			tags.map(([tag, count]) => (
+				<li class="flex items-center gap-x-2">
+					<a class="cactus-link inline-block" href={`/${currentLang}/tags/${tag}/`}>
+						&#35;{tag}
+					</a>
+					<span class="inline-block">
+						- {count} Post{count > 1 && "s"}
+					</span>
+				</li>
+			))
+		}
+	</ul>
+</PageLayout>

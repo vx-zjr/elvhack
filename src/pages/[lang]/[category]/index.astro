@@ -1,0 +1,83 @@
+---
+import type { GetStaticPaths, InferGetStaticPropsType } from "astro";
+import PostPreview from "@/components/blog/PostPreview.astro";
+import {
+	categoryMeta,
+	getCategoryUrl,
+	getPostsByCategory,
+	languageMeta,
+	POST_CATEGORIES,
+	POST_LANGS,
+	type PostCategory,
+	type PostLang,
+} from "@/data/post";
+import PageLayout from "@/layouts/Base.astro";
+
+export const getStaticPaths = (() => {
+	return POST_LANGS.flatMap((lang) =>
+		POST_CATEGORIES.map((category) => ({
+			params: { category, lang },
+			props: { category, lang },
+		})),
+	);
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { category, lang } = Astro.props as Props;
+const currentLang = lang as PostLang;
+const currentCategory = category as PostCategory;
+const posts = await getPostsByCategory(currentLang, currentCategory);
+const title = categoryMeta[currentCategory].label;
+const description = categoryMeta[currentCategory].description[currentLang];
+const otherLang = currentLang === "zh" ? "en" : "zh";
+const otherCategory = currentCategory === "quant" ? "technology" : "quant";
+---
+
+<PageLayout
+	meta={{
+		alternateLinks: [
+			{
+				href: getCategoryUrl("zh", currentCategory),
+				hreflang: languageMeta.zh.htmlLang,
+			},
+			{
+				href: getCategoryUrl("en", currentCategory),
+				hreflang: languageMeta.en.htmlLang,
+			},
+		],
+		canonical: getCategoryUrl(currentLang, currentCategory),
+		description,
+		lang: currentLang,
+		rssHref: `/${currentLang}/rss.xml`,
+		title,
+	}}
+>
+	<section class="mb-12">
+		<div class="mb-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] tracking-[0.18em] text-muted uppercase">
+			<a class="hover:text-global-text" href={getCategoryUrl(currentLang, otherCategory)}>
+				{categoryMeta[otherCategory].label}
+			</a>
+			<a class="hover:text-global-text" href={getCategoryUrl(otherLang, currentCategory)}>
+				{otherLang}
+			</a>
+			<a class="hover:text-global-text" href={`/${currentLang}/tags/`}>tags</a>
+			<a class="hover:text-global-text" href={`/${currentLang}/rss.xml`}>rss</a>
+		</div>
+		<h1 class="title mb-4 text-4xl">{title}</h1>
+		<p class="max-w-2xl font-serif text-lg leading-8 text-global-text/85">{description}</p>
+	</section>
+	{
+		posts.length > 0 ? (
+			<ul class="space-y-5">
+				{posts.map((post) => (
+					<li class="grid gap-1 sm:grid-cols-[auto_1fr] sm:[&_q]:col-start-2">
+						<PostPreview post={post} withDesc />
+					</li>
+				))}
+			</ul>
+		) : (
+			<p class="text-muted">No posts yet.</p>
+		)
+	}
+</PageLayout>
