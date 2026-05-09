@@ -1,0 +1,29 @@
+---
+import { menuLinks, siteConfig } from "@/site.config";
+---
+
+<header class="mb-20 flex items-baseline justify-between gap-6 border-b border-faint pb-5">
+	<a
+		aria-current={Astro.url.pathname === "/" ? "page" : false}
+		class="font-serif text-lg italic tracking-normal text-global-text"
+		href="/"
+	>
+		<b class="font-medium not-italic text-accent">elv</b>{siteConfig.title.replace("elv", "")}
+	</a>
+	<nav
+		aria-label="Main menu"
+		class="flex flex-wrap items-center justify-end gap-x-5 gap-y-2 text-[11px] tracking-[0.18em] text-muted uppercase"
+	>
+		{
+			menuLinks.map((link) => (
+				<a
+					aria-current={Astro.url.pathname === link.path ? "page" : false}
+					class="hover:text-global-text aria-current:text-accent"
+					href={link.path}
+				>
+					{link.title}
+				</a>
+			))
+		}
+	</nav>
+</header>

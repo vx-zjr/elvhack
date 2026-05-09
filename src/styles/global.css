@@ -1,0 +1,145 @@
+@import "tailwindcss";
+/* tailwind to ignore satori generated og-image */
+@source not "../pages/og-image";
+/* config for tailwindcss-typography plugin */
+@config "../../tailwind.config.ts";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@property --color-global-bg {
+	syntax: "<color>";
+	inherits: true;
+	initial-value: #08080c;
+}
+@property --color-global-text {
+	syntax: "<color>";
+	inherits: true;
+	initial-value: #e8e6e0;
+}
+@property --color-muted {
+	syntax: "<color>";
+	inherits: true;
+	initial-value: #6f6c64;
+}
+@property --color-link {
+	syntax: "<color>";
+	inherits: true;
+	initial-value: #5fffd7;
+}
+@property --color-accent {
+	syntax: "<color>";
+	inherits: true;
+	initial-value: #5fffd7;
+}
+@property --color-accent-2 {
+	syntax: "<color>";
+	inherits: true;
+	initial-value: #e8e6e0;
+}
+@property --color-quote {
+	syntax: "<color>";
+	inherits: true;
+	initial-value: #5fffd7;
+}
+
+@theme {
+	--color-bg: #08080c;
+	--color-fg: #e8e6e0;
+	--color-dim: #6f6c64;
+	--color-faint: rgb(232 230 224 / 0.1);
+	--color-acc: #5fffd7;
+
+	--color-global-bg: #08080c;
+	--color-global-text: #e8e6e0;
+	--color-muted: #6f6c64;
+	--color-link: #5fffd7;
+	--color-accent: #5fffd7;
+	--color-accent-2: #e8e6e0;
+	--color-quote: #5fffd7;
+
+	--font-serif:
+		"EB Garamond Variable", "Iowan Old Style", Georgia, "PingFang SC", "Hiragino Sans GB",
+		"Noto Sans CJK SC", serif;
+	--font-mono:
+		"JetBrains Mono Variable", ui-monospace, "SF Mono", Menlo, Consolas, "PingFang SC",
+		"Microsoft YaHei", monospace;
+
+	--ease-elv: cubic-bezier(0.7, 0, 0.2, 1);
+	--dur-reveal: 720ms;
+	--dur-bar: 480ms;
+	--dur-blink: 1050ms;
+	--dur-pulse: 2600ms;
+	--dur-hint: 600ms;
+}
+
+@layer base {
+	html {
+		color-scheme: dark;
+		accent-color: var(--color-accent);
+		background: var(--color-global-bg);
+		scrollbar-gutter: stable;
+	}
+
+	body {
+		background: var(--color-global-bg);
+		color: var(--color-global-text);
+		font-family: var(--font-mono);
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+
+	a {
+		text-underline-offset: 0.2em;
+	}
+
+	:target {
+		scroll-margin-block: 5ex;
+	}
+
+	@view-transition {
+		navigation: auto;
+	}
+
+	:where([data-astro-image]) {
+		object-fit: var(--fit);
+		object-position: var(--pos);
+	}
+	[data-astro-image="full-width"] {
+		width: 100%;
+	}
+	[data-astro-image="constrained"] {
+		max-width: 100%;
+	}
+}
+
+@layer components {
+	@import "./components/admonition.css";
+	@import "./components/github-card.css";
+
+	.cactus-link {
+		@apply underline underline-offset-2 hover:decoration-2;
+		text-decoration-color: rgb(95 255 215 / 0.45);
+	}
+
+	.cactus-link:hover {
+		color: var(--color-link);
+		text-decoration-color: var(--color-link);
+	}
+
+	.title {
+		@apply text-accent-2 font-serif text-2xl font-normal;
+		letter-spacing: 0;
+	}
+}
+
+@utility prose {
+	--tw-prose-body: var(--color-global-text);
+	--tw-prose-bold: var(--color-global-text);
+	--tw-prose-bullets: var(--color-global-text);
+	--tw-prose-code: var(--color-global-text);
+	--tw-prose-headings: var(--color-accent-2);
+	--tw-prose-hr: 0.5px solid rgb(232 230 224 / 0.1);
+	--tw-prose-links: var(--color-global-text);
+	--tw-prose-quotes: var(--color-quote);
+	--tw-prose-th-borders: rgb(232 230 224 / 0.16);
+}

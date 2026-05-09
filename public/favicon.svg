@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="elvhack">
+  <rect width="64" height="64" fill="#08080c"/>
+  <path d="M32 8 56 32 32 56 8 32Z" fill="none" stroke="#5fffd7" stroke-width="3"/>
+  <path d="M22 32h20M32 22v20" stroke="#e8e6e0" stroke-linecap="square" stroke-width="3"/>
+</svg>

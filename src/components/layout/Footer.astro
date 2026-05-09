@@ -1,0 +1,12 @@
+---
+import { siteConfig } from "@/site.config";
+
+const year = new Date().getFullYear();
+---
+
+<footer
+	class="mt-auto flex w-full items-center justify-between gap-6 border-t border-faint pt-8 pb-5 text-[11px] tracking-[0.18em] text-muted uppercase"
+>
+	<span>&copy; {year} {siteConfig.author}</span>
+	<span>all systems nominal</span>
+</footer>
