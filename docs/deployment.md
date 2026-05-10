@@ -1,15 +1,17 @@
 # Deployment
 
-Cloudflare Pages owns production deployment. Git is the deployment trigger.
+Cloudflare Workers Builds owns production deployment. Git is the deployment
+trigger.
 
 ## Current Flow
 
 1. Push to `main`.
-2. Cloudflare Pages checks out the repo.
-3. Pages runs `npm run build`.
-4. Pages deploys `./dist` and the `functions/` directory.
+2. Cloudflare Workers Builds checks out the repo.
+3. Workers Builds runs `npm run build`.
+4. Workers deploys `./dist` as Static Assets and runs `src/worker.ts` for
+   `/api/*`.
 
-No local `wrangler pages deploy` is required for normal Git-connected work.
+No local deploy is required for normal Git-connected work.
 
 ## Required Cloudflare Shape
 
@@ -18,7 +20,13 @@ No local `wrangler pages deploy` is required for normal Git-connected work.
 ```toml
 name = "elvhack"
 compatibility_date = "2026-05-01"
-pages_build_output_dir = "./dist"
+main = "./src/worker.ts"
+workers_dev = true
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+run_worker_first = ["/api/*"]
 
 [[d1_databases]]
 binding = "DB"
@@ -27,10 +35,11 @@ database_id = "588dc81a-d609-4b2f-9e92-e30c468b20d7"
 preview_database_id = "DB"
 ```
 
-In the Cloudflare Pages dashboard, confirm:
+In the Cloudflare Workers Builds dashboard, confirm:
 
 - Build command: `npm run build`
-- Build output directory: `dist`
+- Deploy command: `npx wrangler deploy`
+- `workers.dev` route is enabled, or a custom domain/route is active
 - Production D1 binding: `DB` -> `prod-d1-tutorial`
 - Preview D1 binding: `DB` -> the intended preview database, or the same
   database if that is the deliberate choice
@@ -38,10 +47,8 @@ In the Cloudflare Pages dashboard, confirm:
 For direct CLI deployment:
 
 ```bash
-npm run build && npx wrangler pages deploy dist --project-name elvhack
+npm run build && npx wrangler deploy
 ```
-
-Do not use `wrangler deploy` for this Pages project.
 
 ## D1 Migration
 
@@ -61,7 +68,7 @@ Local API smoke test:
 
 ```bash
 npm run build
-npx wrangler pages dev dist --port 8788
+npx wrangler dev --port 8788
 curl "http://localhost:8788/api/likes?slug=test-post"
 curl -X POST "http://localhost:8788/api/likes" \
   -H "Content-Type: application/json" \
