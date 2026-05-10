@@ -1,0 +1,27 @@
+---
+import type { MarkdownHeading } from "astro";
+import TOCHeading from "@/components/blog/TOCHeading.astro";
+import { generateToc } from "@/utils/generateToc";
+
+interface Props {
+	headings: MarkdownHeading[];
+}
+
+const { headings } = Astro.props;
+const toc = generateToc(headings);
+---
+
+{
+	toc.length > 0 && (
+		<details class="article-toc-details" open>
+			<summary class="sidebar-title cursor-pointer">Contents</summary>
+			<nav aria-label="Table of contents">
+				<ol class="mt-4 grid gap-2">
+					{toc.map((heading) => (
+						<TOCHeading heading={heading} />
+					))}
+				</ol>
+			</nav>
+		</details>
+	)
+}

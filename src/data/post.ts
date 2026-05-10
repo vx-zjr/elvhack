@@ -76,6 +76,10 @@ export function getPostUrl(post: CollectionEntry<"post">) {
 	return `/${post.data.lang}/${post.data.category}/${post.data.slug}/`;
 }
 
+export function getPostLikeSlug(post: CollectionEntry<"post">) {
+	return `${post.data.lang}/${post.data.category}/${post.data.slug}`;
+}
+
 /** filter out draft posts based on the environment */
 export async function getAllPosts(): Promise<CollectionEntry<"post">[]> {
 	return await getCollection("post", ({ data }) => {

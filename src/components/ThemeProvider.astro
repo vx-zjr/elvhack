@@ -1,13 +1,15 @@
 {/* Inlined to avoid FOUC. This is a parser blocking script. */}
 <script is:inline>
-	const lightModePref = window.matchMedia("(prefers-color-scheme: light)");
+	const darkModePref = window.matchMedia("(prefers-color-scheme: dark)");
+	const themeStorageKey = "theme";
+	const userChoiceStorageKey = "theme-user-choice";
 
 	function getUserPref() {
-		const storedTheme = typeof localStorage !== "undefined" && localStorage.getItem("theme");
-		return storedTheme || (lightModePref.matches ? "light" : "dark");
+		const storedTheme = typeof localStorage !== "undefined" && localStorage.getItem(themeStorageKey);
+		return storedTheme || (darkModePref.matches ? "dark" : "light");
 	}
 
-	function setTheme(newTheme) {
+	function setTheme(newTheme, persist) {
 		if (newTheme !== "light" && newTheme !== "dark") {
 			return console.warn(
 				`Invalid theme value '${newTheme}' received. Expected 'light' or 'dark'.`,
@@ -23,22 +25,27 @@
 
 		root.setAttribute("data-theme", newTheme);
 
-		if (typeof localStorage !== "undefined") {
-			localStorage.setItem("theme", newTheme);
+		if (persist && typeof localStorage !== "undefined") {
+			localStorage.setItem(themeStorageKey, newTheme);
+			localStorage.setItem(userChoiceStorageKey, "true");
 		}
 	}
 
 	// initial setup
-	setTheme(getUserPref());
+	setTheme(getUserPref(), false);
 
 	// View Transitions hook to restore theme
-	document.addEventListener("astro:after-swap", () => setTheme(getUserPref()));
+	document.addEventListener("astro:after-swap", () => setTheme(getUserPref(), false));
 
 	// listen for theme-change custom event, fired in src/components/ThemeToggle.astro
 	document.addEventListener("theme-change", (e) => {
-		setTheme(e.detail.theme);
+		setTheme(e.detail.theme, true);
 	});
 
-	// listen for prefers-color-scheme change.
-	lightModePref.addEventListener("change", (e) => setTheme(e.matches ? "light" : "dark"));
+	// listen for prefers-color-scheme changes until the user explicitly chooses.
+	darkModePref.addEventListener("change", (e) => {
+		const hasUserChoice =
+			typeof localStorage !== "undefined" && localStorage.getItem(userChoiceStorageKey) === "true";
+		if (!hasUserChoice) setTheme(e.matches ? "dark" : "light", false);
+	});
 </script>

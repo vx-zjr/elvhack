@@ -1,5 +1,6 @@
 type Entry = "quant" | "technology";
 type Lang = "zh" | "en";
+type PrerenderableDocument = Document & { prerendering?: boolean };
 
 const canvasNode = document.getElementById("bg");
 const rootNode = document.querySelector<HTMLElement>(".portal");
@@ -8,6 +9,7 @@ const links = [...document.querySelectorAll<HTMLAnchorElement>("[data-entry]")];
 const letters = [...document.querySelectorAll<HTMLElement>(".portal-letter")];
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const compactQuery = window.matchMedia("(max-width: 760px)");
+const TARGET_FRAME_MS = 1000 / 60;
 
 if (
 	!(canvasNode instanceof HTMLCanvasElement) ||
@@ -25,7 +27,7 @@ const glContext = canvas.getContext("webgl", {
 	depth: false,
 	premultipliedAlpha: false,
 	preserveDrawingBuffer: false,
-	powerPreference: "high-performance",
+	powerPreference: "low-power",
 	stencil: false,
 });
 
@@ -51,6 +53,10 @@ let touchStartX = 0;
 let letterRollTimer = 0;
 
 const rollGlyphs = ["0", "1", "7", "/", "\\", "_", ":", "+", "*", "<", ">"];
+
+function isPageActive() {
+	return !document.hidden && !(document as PrerenderableDocument).prerendering;
+}
 
 function preferredLang(): Lang {
 	try {
@@ -151,7 +157,7 @@ function rollRandomLetter() {
 
 function scheduleLetterRoll() {
 	stopLetterRoll();
-	if (reduceMotion || document.hidden) return;
+	if (reduceMotion || !isPageActive()) return;
 	const delay = 2200 + Math.random() * 3200;
 	letterRollTimer = window.setTimeout(() => {
 		rollRandomLetter();
@@ -162,6 +168,9 @@ function scheduleLetterRoll() {
 syncEntryHrefs();
 updatePanelAccessibility();
 root.dataset.active = "0";
+if (document.activeElement === document.body) {
+	root.focus({ preventScroll: true });
+}
 scheduleLetterRoll();
 
 for (const link of links) {
@@ -197,7 +206,7 @@ for (const panel of panels) {
 	});
 }
 
-window.addEventListener(
+root.addEventListener(
 	"pointermove",
 	(event) => {
 		setPointer(event.clientX, event.clientY);
@@ -205,7 +214,7 @@ window.addEventListener(
 	{ passive: true },
 );
 
-window.addEventListener(
+root.addEventListener(
 	"wheel",
 	(event) => {
 		switchByDelta(event.deltaY);
@@ -213,7 +222,7 @@ window.addEventListener(
 	{ passive: true },
 );
 
-window.addEventListener(
+root.addEventListener(
 	"touchstart",
 	(event) => {
 		const touch = event.touches[0];
@@ -225,7 +234,7 @@ window.addEventListener(
 	{ passive: true },
 );
 
-window.addEventListener(
+root.addEventListener(
 	"touchend",
 	(event) => {
 		const touch = event.changedTouches[0];
@@ -241,26 +250,35 @@ window.addEventListener(
 	{ passive: true },
 );
 
-window.addEventListener("keydown", (event) => {
+root.addEventListener("keydown", (event) => {
 	if (event.key === "ArrowDown" || event.key === "PageDown") {
 		event.preventDefault();
 		setActiveIndex(1);
 	} else if (event.key === "ArrowUp" || event.key === "PageUp") {
 		event.preventDefault();
 		setActiveIndex(0);
-	} else if (event.key === "Enter" && document.activeElement === document.body) {
+	} else if (event.key === "Enter" && document.activeElement === root) {
 		event.preventDefault();
 		navigateCurrent();
-	} else if (event.key === " " && document.activeElement === document.body) {
+	} else if (event.key === " " && document.activeElement === root) {
 		event.preventDefault();
 		navigateCurrent();
 	}
 });
 
 document.addEventListener("visibilitychange", () => {
-	if (document.hidden) stopLetterRoll();
+	if (!isPageActive()) stopLetterRoll();
 	else scheduleLetterRoll();
 });
+
+document.addEventListener(
+	"prerenderingchange",
+	() => {
+		state.start = performance.now();
+		scheduleLetterRoll();
+	},
+	{ once: true },
+);
 
 window.addEventListener("pagehide", () => {
 	stopLetterRoll();
@@ -379,9 +397,17 @@ vec3 technologyField(vec2 uv, float aspect){
 void main(){
   vec2 uv = gl_FragCoord.xy / u_res;
   float aspect = u_res.x / u_res.y;
-  vec3 q = quantField(uv, aspect);
-  vec3 t = technologyField(uv, aspect);
-  vec3 col = mix(q, t, smoothstep(0.0, 1.0, u_mode));
+  float blend = smoothstep(0.0, 1.0, u_mode);
+  vec3 col;
+  if (blend <= 0.001) {
+    col = quantField(uv, aspect);
+  } else if (blend >= 0.999) {
+    col = technologyField(uv, aspect);
+  } else {
+    vec3 q = quantField(uv, aspect);
+    vec3 t = technologyField(uv, aspect);
+    col = mix(q, t, blend);
+  }
 
   float vig = smoothstep(1.08, 0.34, length((uv - 0.5) * vec2(aspect, 1.0)));
   col *= vig;
@@ -435,16 +461,18 @@ void main(){
 	let destroyed = false;
 	let slowFrames = 0;
 	let fastFrames = 0;
+	let nextFrameAt = 0;
 
 	function maxDpr() {
 		if (reduceMotion) return 0.75;
-		return compactQuery.matches ? 1 : 1.25;
+		return compactQuery.matches ? 0.9 : 1;
 	}
 
 	function resize(force = false) {
 		const dpr = Math.max(0.55, maxDpr() * quality);
-		const width = Math.max(1, Math.floor(window.innerWidth * dpr));
-		const height = Math.max(1, Math.floor(window.innerHeight * dpr));
+		const rect = root.getBoundingClientRect();
+		const width = Math.max(1, Math.floor(rect.width * dpr));
+		const height = Math.max(1, Math.floor(rect.height * dpr));
 		if (force || canvas.width !== width || canvas.height !== height) {
 			canvas.width = width;
 			canvas.height = height;
@@ -477,6 +505,12 @@ void main(){
 	}
 
 	function render(now: number) {
+		if (!reduceMotion && now < nextFrameAt) {
+			if (running) raf = window.requestAnimationFrame(render);
+			return;
+		}
+		nextFrameAt = now + TARGET_FRAME_MS;
+
 		const dt = reduceMotion ? 1 / 60 : Math.min(0.05, (now - state.lastFrame) / 1000);
 		state.lastFrame = now;
 		const lerp = 1 - 0.001 ** dt;
@@ -484,6 +518,7 @@ void main(){
 		state.mouseY += (state.rawY - state.mouseY) * lerp * 0.55;
 		state.targetMode = targetIndex;
 		state.mode += (targetIndex - state.mode) * lerp * 0.46;
+		if (Math.abs(targetIndex - state.mode) < 0.001) state.mode = targetIndex;
 		state.press += (state.pressTarget - state.press) * lerp * 0.7;
 
 		gl.useProgram(program);
@@ -507,9 +542,10 @@ void main(){
 	}
 
 	function start() {
-		if (running || destroyed || reduceMotion || document.hidden) return;
+		if (running || destroyed || reduceMotion || !isPageActive()) return;
 		running = true;
 		state.lastFrame = performance.now();
+		nextFrameAt = 0;
 		raf = window.requestAnimationFrame(render);
 	}
 
@@ -528,9 +564,17 @@ void main(){
 		if (reduceMotion) drawStill();
 	});
 	document.addEventListener("visibilitychange", () => {
-		if (document.hidden) stop();
+		if (!isPageActive()) stop();
 		else start();
 	});
+	document.addEventListener(
+		"prerenderingchange",
+		() => {
+			state.start = performance.now();
+			start();
+		},
+		{ once: true },
+	);
 	window.addEventListener("pagehide", () => {
 		stop();
 		destroyed = true;

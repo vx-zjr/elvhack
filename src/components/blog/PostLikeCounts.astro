@@ -1,0 +1,35 @@
+<script>
+	type LikeRecord = {
+		count: number;
+		slug: string;
+	};
+
+	type LikesPayload = {
+		likes: LikeRecord[];
+	};
+
+	function formatLikes(count: number) {
+		return `${count} ${count === 1 ? "like" : "likes"}`;
+	}
+
+	async function hydratePostLikeCounts() {
+		const targets = [...document.querySelectorAll<HTMLElement>("[data-list-like-count]")];
+		if (targets.length === 0) return;
+
+		try {
+			const response = await fetch("/api/likes");
+			if (!response.ok) return;
+			const payload = (await response.json()) as LikesPayload;
+			const counts = new Map(payload.likes.map((item) => [item.slug, item.count]));
+			for (const target of targets) {
+				const slug = target.dataset.likeSlug;
+				if (!slug) continue;
+				target.textContent = formatLikes(counts.get(slug) ?? 0);
+			}
+		} catch {
+			// Keep the static zero-count labels.
+		}
+	}
+
+	hydratePostLikeCounts();
+</script>

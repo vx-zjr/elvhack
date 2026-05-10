@@ -1,0 +1,140 @@
+---
+interface Props {
+	latestLabel?: string;
+	likesLabel?: string;
+}
+
+const { latestLabel = "Latest", likesLabel = "Likes" } = Astro.props;
+---
+
+<post-sort-controls
+	class="flex items-center justify-between gap-4 text-[11px] tracking-[0.18em] text-muted uppercase"
+	data-post-sort-controls
+>
+	<div class="flex items-center gap-2">
+		<button
+			aria-pressed="true"
+			class="rounded-md border border-accent px-2.5 py-1 text-accent transition-colors"
+			data-sort-mode="latest"
+			type="button"
+		>
+			{latestLabel}
+		</button>
+		<button
+			aria-pressed="false"
+			class="rounded-md border border-faint px-2.5 py-1 transition-colors hover:border-accent hover:text-accent"
+			data-sort-mode="likes"
+			type="button"
+		>
+			{likesLabel}
+		</button>
+	</div>
+	<span class="min-h-4 text-end text-muted/75" data-sort-status></span>
+</post-sort-controls>
+
+<script>
+	type LikeRecord = {
+		count: number;
+		slug: string;
+	};
+
+	type LikesPayload = {
+		likes: LikeRecord[];
+	};
+
+	class PostSortControls extends HTMLElement {
+		private likes: Map<string, number> | undefined;
+		private status: HTMLElement | null;
+
+		constructor() {
+			super();
+			this.status = this.querySelector<HTMLElement>("[data-sort-status]");
+		}
+
+		connectedCallback() {
+			for (const button of this.querySelectorAll<HTMLButtonElement>("[data-sort-mode]")) {
+				button.addEventListener("click", () => this.setMode(button.dataset.sortMode ?? "latest"));
+			}
+		}
+
+		private async setMode(mode: string) {
+			this.setPressed(mode);
+			if (mode === "likes") {
+				try {
+					await this.ensureLikes();
+					this.sortByLikes();
+					this.setStatus("");
+				} catch {
+					this.setStatus("Latest");
+					this.setPressed("latest");
+					this.sortByLatest();
+				}
+				return;
+			}
+
+			this.setStatus("");
+			this.sortByLatest();
+		}
+
+		private setPressed(mode: string) {
+			for (const button of this.querySelectorAll<HTMLButtonElement>("[data-sort-mode]")) {
+				const active = button.dataset.sortMode === mode;
+				button.setAttribute("aria-pressed", String(active));
+				button.classList.toggle("border-accent", active);
+				button.classList.toggle("text-accent", active);
+				button.classList.toggle("border-faint", !active);
+			}
+		}
+
+		private getList() {
+			return document.querySelector<HTMLElement>("[data-sortable-post-list]");
+		}
+
+		private getItems() {
+			return [...document.querySelectorAll<HTMLElement>("[data-post-item]")];
+		}
+
+		private async ensureLikes() {
+			if (this.likes) return;
+
+			this.setStatus("...");
+			const response = await fetch("/api/likes");
+			if (!response.ok) throw new Error("Unable to load likes.");
+			const payload = (await response.json()) as LikesPayload;
+			this.likes = new Map(payload.likes.map((item) => [item.slug, item.count]));
+		}
+
+		private sortByLikes() {
+			const likes = this.likes ?? new Map<string, number>();
+			this.sortItems((a, b) => {
+				const likeDiff = this.countFor(b, likes) - this.countFor(a, likes);
+				if (likeDiff !== 0) return likeDiff;
+				return this.timeFor(b) - this.timeFor(a);
+			});
+		}
+
+		private sortByLatest() {
+			this.sortItems((a, b) => this.timeFor(b) - this.timeFor(a));
+		}
+
+		private sortItems(compare: (a: HTMLElement, b: HTMLElement) => number) {
+			const list = this.getList();
+			if (!list) return;
+			for (const item of this.getItems().sort(compare)) list.append(item);
+		}
+
+		private countFor(item: HTMLElement, likes: Map<string, number>) {
+			return likes.get(item.dataset.likeSlug ?? "") ?? 0;
+		}
+
+		private timeFor(item: HTMLElement) {
+			return Date.parse(item.dataset.published ?? "0");
+		}
+
+		private setStatus(message: string) {
+			if (this.status) this.status.textContent = message;
+		}
+	}
+
+	customElements.define("post-sort-controls", PostSortControls);
+</script>

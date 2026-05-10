@@ -1,0 +1,117 @@
+---
+interface Props {
+	slug: string;
+	title?: string;
+}
+
+const { slug, title = "this post" } = Astro.props;
+---
+
+<div
+	class="like-control mt-10 border-t border-faint pt-5 text-xs text-muted"
+	data-like-button
+	data-slug={slug}
+>
+	<button
+		aria-label={`Like ${title}`}
+		class="inline-flex min-h-8 items-center gap-2 rounded-md border border-faint bg-card-bg px-3 py-1.5 text-global-text transition-colors hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-70"
+		data-like-action
+		type="button"
+	>
+		<span aria-hidden="true" data-like-icon>+</span>
+		<span data-like-count>0</span>
+	</button>
+	<span class="ms-3 align-middle text-muted" data-like-status></span>
+</div>
+
+<script>
+	type LikeResponse = {
+		count: number;
+		liked?: boolean;
+		slug: string;
+	};
+
+	const storageKey = "liked_posts";
+
+	function readLikedPosts() {
+		try {
+			const raw = localStorage.getItem(storageKey);
+			const parsed = raw ? JSON.parse(raw) : [];
+			return Array.isArray(parsed) ? parsed.filter((value) => typeof value === "string") : [];
+		} catch {
+			return [];
+		}
+	}
+
+	function writeLikedPosts(slugs: string[]) {
+		localStorage.setItem(storageKey, JSON.stringify([...new Set(slugs)]));
+	}
+
+	function setLiked(root: HTMLElement, liked: boolean) {
+		const button = root.querySelector<HTMLButtonElement>("[data-like-action]");
+		const icon = root.querySelector<HTMLElement>("[data-like-icon]");
+		if (!button || !icon) return;
+
+		button.disabled = liked;
+		button.dataset.liked = String(liked);
+		icon.textContent = liked ? "+1" : "+";
+	}
+
+	function setCount(root: HTMLElement, count: number) {
+		const target = root.querySelector<HTMLElement>("[data-like-count]");
+		if (target) target.textContent = String(count);
+	}
+
+	function setStatus(root: HTMLElement, message: string) {
+		const target = root.querySelector<HTMLElement>("[data-like-status]");
+		if (target) target.textContent = message;
+	}
+
+	async function setupLikeButton(root: HTMLElement) {
+		const slug = root.dataset.slug;
+		const button = root.querySelector<HTMLButtonElement>("[data-like-action]");
+		if (!slug || !button) return;
+
+		const likedPosts = readLikedPosts();
+		setLiked(root, likedPosts.includes(slug));
+
+		try {
+			// Initial load: GET /api/likes?slug=...
+			const response = await fetch(`/api/likes?slug=${encodeURIComponent(slug)}`);
+			if (!response.ok) throw new Error("Unable to load likes.");
+			const payload = (await response.json()) as LikeResponse;
+			setCount(root, payload.count);
+		} catch {
+			setStatus(root, "Unavailable");
+		}
+
+		button.addEventListener("click", async () => {
+			if (button.disabled) return;
+
+			const before = Number(root.querySelector("[data-like-count]")?.textContent ?? "0");
+			setStatus(root, "");
+			setCount(root, before + 1);
+			setLiked(root, true);
+
+			try {
+				const response = await fetch("/api/likes", {
+					method: "POST",
+					headers: { "content-type": "application/json" },
+					body: JSON.stringify({ slug }),
+				});
+				if (!response.ok) throw new Error("Unable to update likes.");
+				const payload = (await response.json()) as LikeResponse;
+				setCount(root, payload.count);
+				writeLikedPosts([...readLikedPosts(), slug]);
+			} catch {
+				setCount(root, before);
+				setLiked(root, false);
+				setStatus(root, "Try again");
+			}
+		});
+	}
+
+	for (const root of document.querySelectorAll<HTMLElement>("[data-like-button]")) {
+		setupLikeButton(root);
+	}
+</script>

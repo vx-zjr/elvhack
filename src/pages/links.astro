@@ -1,0 +1,67 @@
+---
+import { Icon } from "astro-icon/components";
+import PageShell from "@/components/layout/PageShell.astro";
+import SurfaceCard from "@/components/layout/SurfaceCard.astro";
+import { siteLinks } from "@/data/links";
+import BaseLayout from "@/layouts/Base.astro";
+
+const meta = {
+	description: "elvhack links and feeds.",
+	title: "Links",
+};
+---
+
+<BaseLayout meta={meta}>
+	<PageShell class="info-grid" variant="wide">
+		<section>
+			<p class="page-kicker">Links</p>
+			<h1 class="page-title">Feeds, public profiles, and contact surfaces.</h1>
+			<p class="page-description">
+				A compact index for following the writing and related work. External links are intentionally
+				plain and low contrast.
+			</p>
+		</section>
+
+		<aside class="grid gap-3">
+			{
+				siteLinks.map((link) => (
+					<SurfaceCard class="link-card">
+						<div class="flex items-start gap-3">
+							<Icon
+								aria-hidden="true"
+								class="mt-0.5 h-5 w-5 text-muted"
+								focusable="false"
+								name={link.icon}
+							/>
+							<div class="min-w-0 flex-1">
+								{link.url ? (
+									<a
+										class="cactus-link font-semibold"
+										href={link.url}
+										rel={link.external ? "noopener noreferrer" : undefined}
+										target={link.external ? "_blank" : undefined}
+									>
+										{link.name}
+									</a>
+								) : (
+									<h2 class="font-semibold text-global-text">{link.name}</h2>
+								)}
+								<p class="mt-1 text-sm leading-6 text-muted">{link.description}</p>
+								{link.qrImage && (
+									<img
+										alt={`${link.name} QR placeholder`}
+										class="mt-4 h-28 w-28 border border-faint bg-surface p-2"
+										height="112"
+										loading="lazy"
+										src={link.qrImage}
+										width="112"
+									/>
+								)}
+							</div>
+						</div>
+					</SurfaceCard>
+				))
+			}
+		</aside>
+	</PageShell>
+</BaseLayout>

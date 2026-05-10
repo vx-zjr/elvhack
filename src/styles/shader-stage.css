@@ -7,7 +7,6 @@
 html,
 body {
 	min-height: 100%;
-	overflow: hidden;
 	background: var(--color-global-bg);
 	color: var(--color-global-text);
 	font-family: var(--font-mono);
@@ -30,7 +29,7 @@ body {
 }
 
 canvas#bg {
-	position: fixed;
+	position: absolute;
 	inset: 0;
 	display: block;
 	width: 100%;
@@ -39,7 +38,7 @@ canvas#bg {
 }
 
 .grain {
-	position: fixed;
+	position: absolute;
 	inset: 0;
 	z-index: 1;
 	pointer-events: none;
@@ -78,6 +77,8 @@ canvas#bg {
 }
 
 .portal-panel {
+	--portal-frame-color: var(--color-accent);
+
 	position: relative;
 	display: grid;
 	height: 100vh;
@@ -87,17 +88,27 @@ canvas#bg {
 	place-items: start start;
 	opacity: 0.18;
 	filter: blur(8px);
-	transform: scale(0.985);
+	transform: translate3d(-6vw, 4vh, 0) scale(0.985);
 	transition:
 		opacity 560ms var(--ease-elv),
 		filter 760ms var(--ease-elv),
 		transform 760ms var(--ease-elv);
 }
 
+.portal-panel--quant {
+	--portal-frame-color: var(--color-quant-frame);
+}
+
+.portal-panel--technology {
+	place-items: end end;
+	text-align: right;
+	transform: translate3d(6vw, -4vh, 0) scale(0.985);
+}
+
 .portal-panel.is-active {
 	opacity: 1;
 	filter: blur(0);
-	transform: scale(1);
+	transform: translate3d(0, 0, 0) scale(1);
 }
 
 .portal-link {
@@ -116,11 +127,18 @@ canvas#bg {
 	-webkit-tap-highlight-color: transparent;
 }
 
+.portal-panel--technology .portal-link {
+	margin-top: 0;
+	margin-bottom: clamp(42px, 8vh, 116px);
+	place-items: end end;
+	text-align: right;
+}
+
 .portal-brand {
 	display: flex;
 	justify-content: flex-start;
 	gap: clamp(7px, 0.8vw, 14px);
-	margin-bottom: clamp(10px, 1.4vw, 18px);
+	margin-bottom: clamp(26px, 3.4vw, 54px);
 	color: var(--color-muted);
 	font-size: clamp(0.66rem, 1.1vw, 0.92rem);
 	font-weight: 700;
@@ -159,7 +177,7 @@ canvas#bg {
 
 .portal-title {
 	position: relative;
-	display: block;
+	display: inline-block;
 	max-width: 100%;
 	font-family: var(--font-mono);
 	font-size: clamp(4.6rem, 11vw, 12.5rem);
@@ -167,11 +185,13 @@ canvas#bg {
 	line-height: 0.82;
 	letter-spacing: 0;
 	text-transform: uppercase;
+	white-space: nowrap;
 }
 
 .portal-title__main,
 .portal-title__ghost,
-.portal-title__scan {
+.portal-title__scan,
+.portal-title__slice {
 	display: block;
 	overflow-wrap: anywhere;
 }
@@ -182,6 +202,7 @@ canvas#bg {
 	color: var(--color-global-text);
 	display: flex;
 	gap: 0.012em;
+	opacity: 0.16;
 	text-shadow:
 		0 2px 24px rgb(0 0 0 / 0.55),
 		0 0 48px color-mix(in srgb, var(--color-accent) 20%, transparent);
@@ -225,22 +246,119 @@ canvas#bg {
 }
 
 .portal-title__ghost,
-.portal-title__scan {
+.portal-title__scan,
+.portal-title__slice,
+.portal-title__border {
 	position: absolute;
-	inset: 0;
 	pointer-events: none;
 }
 
 .portal-title__ghost {
+	inset: 0;
 	z-index: 1;
 	color: color-mix(in srgb, var(--color-accent) 72%, transparent);
-	opacity: 0.34;
+	opacity: 0.22;
 	transform: translate3d(-0.045em, 0.04em, 0);
 	clip-path: polygon(0 0, 100% 0, 100% 42%, 0 56%);
 	animation: title-shift 2600ms steps(2, end) infinite;
 }
 
+.portal-title__slice {
+	top: 0;
+	bottom: 0;
+	z-index: 4;
+	overflow: hidden;
+	color: var(--color-global-text);
+	text-shadow:
+		0 2px 24px rgb(0 0 0 / 0.55),
+		0 0 48px color-mix(in srgb, var(--color-accent) 24%, transparent);
+}
+
+.portal-title__slice--left {
+	left: 0;
+	width: 51%;
+}
+
+.portal-title__slice--right {
+	right: 0;
+	width: 50%;
+}
+
+.portal-title__slice-inner {
+	display: block;
+	width: max-content;
+	animation-duration: 5200ms;
+	animation-iteration-count: infinite;
+	animation-timing-function: var(--ease-elv);
+	will-change: transform;
+}
+
+.portal-title__slice--left .portal-title__slice-inner {
+	animation-name: portal-slice-left;
+}
+
+.portal-title__slice--right .portal-title__slice-inner {
+	transform: translateX(-50%);
+	animation-name: portal-slice-right;
+}
+
+.portal-title__border {
+	inset: -0.12em -0.16em -0.08em;
+	z-index: 6;
+	overflow: hidden;
+}
+
+.portal-title__border span {
+	position: absolute;
+	background: color-mix(in srgb, var(--portal-frame-color) 88%, var(--color-global-text));
+	box-shadow: 0 0 18px color-mix(in srgb, var(--portal-frame-color) 28%, transparent);
+	will-change: transform;
+}
+
+.portal-title__border span:nth-child(1) {
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: max(1px, 0.014em);
+	transform: translateX(-101%);
+	animation: portal-border-top 5200ms ease infinite;
+}
+
+.portal-title__border span:nth-child(2) {
+	top: 0;
+	right: 0;
+	width: max(1px, 0.014em);
+	height: 100%;
+	transform: translateY(-101%);
+	animation: portal-border-right 5200ms ease infinite;
+}
+
+.portal-title__border span:nth-child(3) {
+	right: 0;
+	bottom: 0;
+	width: 100%;
+	height: max(1px, 0.014em);
+	transform: translateX(101%);
+	animation: portal-border-bottom 5200ms ease infinite;
+}
+
+.portal-title__border span:nth-child(4) {
+	top: 0;
+	left: 0;
+	width: max(1px, 0.014em);
+	height: 100%;
+	transform: translateY(101%);
+	animation: portal-border-left 5200ms ease infinite;
+}
+
+.portal-panel:not(.is-active) .portal-title__slice-inner,
+.portal-panel:not(.is-active) .portal-title__border span,
+.portal-panel:not(.is-active) .portal-brand span {
+	animation-play-state: paused;
+}
+
 .portal-title__scan {
+	inset: 0;
 	z-index: 3;
 	color: transparent;
 	background:
@@ -316,9 +434,18 @@ canvas#bg {
 		place-items: start start;
 	}
 
+	.portal-panel--technology {
+		place-items: end end;
+	}
+
 	.portal-link {
 		width: min(84vw, 520px);
 		margin-top: clamp(34px, 8vh, 82px);
+	}
+
+	.portal-panel--technology .portal-link {
+		margin-top: 0;
+		margin-bottom: clamp(34px, 8vh, 82px);
 	}
 
 	.portal-title {
@@ -354,6 +481,8 @@ canvas#bg {
 	.portal-title__main,
 	.portal-title__ghost,
 	.portal-title__scan,
+	.portal-title__slice-inner,
+	.portal-title__border span,
 	.portal-brand span,
 	.portal-letter,
 	.portal-letter::before,
@@ -363,7 +492,8 @@ canvas#bg {
 	}
 
 	.portal-title__ghost,
-	.portal-title__scan {
+	.portal-title__scan,
+	.portal-title__border {
 		display: none;
 	}
 }
@@ -418,6 +548,100 @@ canvas#bg {
 		background-position:
 			0 160%,
 			0 18px;
+	}
+}
+
+@keyframes portal-slice-left {
+	0% {
+		opacity: 0;
+		transform: translateX(100%);
+	}
+	12%,
+	58% {
+		opacity: 1;
+		transform: translateX(0);
+	}
+	72%,
+	100% {
+		opacity: 0;
+		transform: translateX(-200%);
+	}
+}
+
+@keyframes portal-slice-right {
+	0% {
+		opacity: 0;
+		transform: translateX(-150%);
+	}
+	12%,
+	58% {
+		opacity: 1;
+		transform: translateX(-50%);
+	}
+	72%,
+	100% {
+		opacity: 0;
+		transform: translateX(-250%);
+	}
+}
+
+@keyframes portal-border-top {
+	0%,
+	16% {
+		transform: translateX(-101%);
+	}
+	26%,
+	56% {
+		transform: translateX(0);
+	}
+	68%,
+	100% {
+		transform: translateX(101%);
+	}
+}
+
+@keyframes portal-border-right {
+	0%,
+	22% {
+		transform: translateY(-101%);
+	}
+	32%,
+	62% {
+		transform: translateY(0);
+	}
+	74%,
+	100% {
+		transform: translateY(101%);
+	}
+}
+
+@keyframes portal-border-bottom {
+	0%,
+	28% {
+		transform: translateX(101%);
+	}
+	40%,
+	68% {
+		transform: translateX(0);
+	}
+	80%,
+	100% {
+		transform: translateX(-101%);
+	}
+}
+
+@keyframes portal-border-left {
+	0%,
+	34% {
+		transform: translateY(101%);
+	}
+	46%,
+	76% {
+		transform: translateY(0);
+	}
+	88%,
+	100% {
+		transform: translateY(-101%);
 	}
 }
 

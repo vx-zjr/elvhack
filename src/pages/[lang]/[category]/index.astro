@@ -1,10 +1,14 @@
 ---
 import type { GetStaticPaths, InferGetStaticPropsType } from "astro";
-import PostPreview from "@/components/blog/PostPreview.astro";
+import ArticleListItem from "@/components/blog/ArticleListItem.astro";
+import PostLikeCounts from "@/components/blog/PostLikeCounts.astro";
+import PostSortControls from "@/components/blog/PostSortControls.astro";
+import PageShell from "@/components/layout/PageShell.astro";
 import {
 	categoryMeta,
 	getCategoryUrl,
 	getPostsByCategory,
+	getUniqueTagsWithCount,
 	languageMeta,
 	POST_CATEGORIES,
 	POST_LANGS,
@@ -30,8 +34,7 @@ const currentCategory = category as PostCategory;
 const posts = await getPostsByCategory(currentLang, currentCategory);
 const title = categoryMeta[currentCategory].label;
 const description = categoryMeta[currentCategory].description[currentLang];
-const otherLang = currentLang === "zh" ? "en" : "zh";
-const otherCategory = currentCategory === "quant" ? "technology" : "quant";
+const tags = getUniqueTagsWithCount(posts).slice(0, 12);
 ---
 
 <PageLayout
@@ -53,31 +56,56 @@ const otherCategory = currentCategory === "quant" ? "technology" : "quant";
 		title,
 	}}
 >
-	<section class="mb-12">
-		<div class="mb-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] tracking-[0.18em] text-muted uppercase">
-			<a class="hover:text-global-text" href={getCategoryUrl(currentLang, otherCategory)}>
-				{categoryMeta[otherCategory].label}
-			</a>
-			<a class="hover:text-global-text" href={getCategoryUrl(otherLang, currentCategory)}>
-				{otherLang}
-			</a>
-			<a class="hover:text-global-text" href={`/${currentLang}/tags/`}>tags</a>
-			<a class="hover:text-global-text" href={`/${currentLang}/rss.xml`}>rss</a>
+	<PageShell class="blog-index-page" variant="wide">
+		<header class="page-header">
+			<p class="page-kicker">Blog Index</p>
+			<h1 class="page-title">{title}</h1>
+			<p class="page-description">{description}</p>
+		</header>
+
+		<div class="blog-index-layout">
+			<section class="post-list" aria-label={`${title} posts`}>
+				{
+					posts.length > 0 ? (
+						<div class="compact-list" data-sortable-post-list>
+							{posts.map((post) => (
+								<ArticleListItem post={post} />
+							))}
+						</div>
+					) : (
+						<p class="text-muted">No posts yet.</p>
+					)
+				}
+				<PostLikeCounts />
+			</section>
+
+			<aside class="blog-sidebar" aria-label="Blog controls">
+				<section class="surface-card sidebar-block">
+					<h2 class="sidebar-title">Sort</h2>
+					<PostSortControls
+						latestLabel={currentLang === "zh" ? "最新发布" : "Latest"}
+						likesLabel={currentLang === "zh" ? "点赞最多" : "Likes"}
+					/>
+				</section>
+				<section class="surface-card sidebar-block">
+					<h2 class="sidebar-title">Index</h2>
+					<p class="text-sm text-muted">{posts.length} posts</p>
+				</section>
+				{
+					tags.length > 0 && (
+						<section class="surface-card sidebar-block">
+							<h2 class="sidebar-title">Tags</h2>
+							<div class="tag-list">
+								{tags.map(([tag, count]) => (
+									<a class="tag-pill" href={`/${currentLang}/tags/${tag}/`}>
+										#{tag} {count}
+									</a>
+								))}
+							</div>
+						</section>
+					)
+				}
+			</aside>
 		</div>
-		<h1 class="title mb-4 text-4xl">{title}</h1>
-		<p class="max-w-2xl font-serif text-lg leading-8 text-global-text/85">{description}</p>
-	</section>
-	{
-		posts.length > 0 ? (
-			<ul class="space-y-5">
-				{posts.map((post) => (
-					<li class="grid gap-1 sm:grid-cols-[auto_1fr] sm:[&_q]:col-start-2">
-						<PostPreview post={post} withDesc />
-					</li>
-				))}
-			</ul>
-		) : (
-			<p class="text-muted">No posts yet.</p>
-		)
-	}
+	</PageShell>
 </PageLayout>

@@ -1,0 +1,57 @@
+---
+import type { CollectionEntry } from "astro:content";
+import LikeButton from "@/components/blog/LikeButton.astro";
+import FormattedDate from "@/components/FormattedDate.astro";
+import { categoryMeta, getCategoryUrl } from "@/data/post";
+
+interface Props {
+	compact?: boolean;
+	likeSlug: string;
+	post: CollectionEntry<"post">;
+	readingTime: string;
+	showLike?: boolean;
+}
+
+const { compact = false, likeSlug, post, readingTime, showLike = false } = Astro.props;
+const { category, lang, publishDate, tags, title, updatedDate } = post.data;
+---
+
+<div class:list={["meta-stack", compact && "meta-stack--compact"]}>
+	<div class="meta-row">
+		<span class="meta-label">Published</span>
+		<span class="meta-value"><FormattedDate date={publishDate} /></span>
+	</div>
+	{
+		updatedDate && (
+			<div class="meta-row">
+				<span class="meta-label">Updated</span>
+				<span class="meta-value"><FormattedDate date={updatedDate} /></span>
+			</div>
+		)
+	}
+	<div class="meta-row">
+		<span class="meta-label">Read</span>
+		<span class="meta-value">{readingTime}</span>
+	</div>
+	<div class="meta-row">
+		<span class="meta-label">Category</span>
+		<a class="cactus-link meta-value" href={getCategoryUrl(lang, category)}>
+			{categoryMeta[category].label}
+		</a>
+	</div>
+	{
+		tags.length > 0 && (
+			<div class="meta-row">
+				<span class="meta-label">Tags</span>
+				<div class="tag-list">
+					{tags.map((tag) => (
+						<a class="tag-pill" data-pagefind-filter={`tag:${tag}`} href={`/${lang}/tags/${tag}/`}>
+							#{tag}
+						</a>
+					))}
+				</div>
+			</div>
+		)
+	}
+	{showLike && <LikeButton slug={likeSlug} title={title} />}
+</div>

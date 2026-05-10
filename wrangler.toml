@@ -1,0 +1,9 @@
+name = "elvhack"
+compatibility_date = "2026-05-01"
+pages_build_output_dir = "./dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "prod-d1-tutorial"
+database_id = "588dc81a-d609-4b2f-9e92-e30c468b20d7"
+preview_database_id = "DB"

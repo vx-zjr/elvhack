@@ -1,12 +1,28 @@
 ---
+import { Icon } from "astro-icon/components";
+import { footerLinks } from "@/data/links";
 import { siteConfig } from "@/site.config";
 
 const year = new Date().getFullYear();
 ---
 
-<footer
-	class="mt-auto flex w-full items-center justify-between gap-6 border-t border-faint pt-8 pb-5 text-[11px] tracking-[0.18em] text-muted uppercase"
->
-	<span>&copy; {year} {siteConfig.author}</span>
-	<span>all systems nominal</span>
+<footer class="site-footer">
+	<div class="site-footer__inner site-shell-wide">
+		<span>&copy; {year} {siteConfig.author}</span>
+		<nav aria-label="Footer links" class="flex items-center gap-3">
+			{
+				footerLinks.map((link) => (
+					<a
+						aria-label={link.name}
+						class="hover:text-accent inline-flex h-7 w-7 items-center justify-center rounded-md border border-transparent transition-colors hover:border-faint focus-visible:border-accent focus-visible:outline-none"
+						href={link.url ?? "/links/"}
+						rel={link.external ? "noopener noreferrer" : undefined}
+						target={link.external ? "_blank" : undefined}
+					>
+						<Icon aria-hidden="true" class="h-4 w-4" focusable="false" name={link.icon} />
+					</a>
+				))
+			}
+		</nav>
+	</div>
 </footer>

@@ -12,6 +12,8 @@ type Props = SiteMeta;
 const {
 	alternateLinks = [],
 	articleDate,
+	articleTags = [],
+	articleUpdatedDate,
 	canonical,
 	description,
 	lang,
@@ -87,6 +89,8 @@ const locale = ogLocale ?? (lang ? languageMeta[lang].locale : siteConfig.ogLoca
 		<>
 			<meta content={siteConfig.author} property="article:author" />
 			<meta content={articleDate} property="article:published_time" />
+			{articleUpdatedDate && <meta content={articleUpdatedDate} property="article:modified_time" />}
+			{articleTags.map((tag) => <meta content={tag} property="article:tag" />)}
 		</>
 	)
 }

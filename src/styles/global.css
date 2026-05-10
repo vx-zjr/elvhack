@@ -6,30 +6,65 @@
 
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
-@property --color-global-bg {
+@property --color-bg {
 	syntax: "<color>";
 	inherits: true;
-	initial-value: #08080c;
+	initial-value: #1c1c1a;
 }
-@property --color-global-text {
+@property --color-surface {
 	syntax: "<color>";
 	inherits: true;
-	initial-value: #e8e6e0;
+	initial-value: #262624;
+}
+@property --color-text {
+	syntax: "<color>";
+	inherits: true;
+	initial-value: #e8e6df;
 }
 @property --color-muted {
 	syntax: "<color>";
 	inherits: true;
-	initial-value: #6f6c64;
+	initial-value: #aaa69d;
+}
+@property --color-border {
+	syntax: "<color>";
+	inherits: true;
+	initial-value: rgb(232 230 223 / 0.12);
 }
 @property --color-link {
 	syntax: "<color>";
 	inherits: true;
 	initial-value: #5fffd7;
 }
+@property --color-code-bg {
+	syntax: "<color>";
+	inherits: true;
+	initial-value: #20201e;
+}
+@property --color-card-bg {
+	syntax: "<color>";
+	inherits: true;
+	initial-value: #242422;
+}
+@property --color-global-bg {
+	syntax: "<color>";
+	inherits: true;
+	initial-value: #1c1c1a;
+}
+@property --color-global-text {
+	syntax: "<color>";
+	inherits: true;
+	initial-value: #e8e6df;
+}
 @property --color-accent {
 	syntax: "<color>";
 	inherits: true;
 	initial-value: #5fffd7;
+}
+@property --color-quant-frame {
+	syntax: "<color>";
+	inherits: true;
+	initial-value: #4aa3ff;
 }
 @property --color-accent-2 {
 	syntax: "<color>";
@@ -43,18 +78,25 @@
 }
 
 @theme {
-	--color-bg: #08080c;
-	--color-fg: #e8e6e0;
-	--color-dim: #6f6c64;
-	--color-faint: rgb(232 230 224 / 0.1);
+	--color-bg: #1c1c1a;
+	--color-surface: #262624;
+	--color-text: #e8e6df;
+	--color-muted: #aaa69d;
+	--color-border: rgb(232 230 223 / 0.12);
+	--color-link: #5fffd7;
+	--color-code-bg: #20201e;
+	--color-card-bg: #242422;
+
+	--color-fg: #e8e6df;
+	--color-dim: #aaa69d;
+	--color-faint: rgb(232 230 223 / 0.12);
 	--color-acc: #5fffd7;
 
-	--color-global-bg: #08080c;
-	--color-global-text: #e8e6e0;
-	--color-muted: #6f6c64;
-	--color-link: #5fffd7;
+	--color-global-bg: #1c1c1a;
+	--color-global-text: #e8e6df;
 	--color-accent: #5fffd7;
-	--color-accent-2: #e8e6e0;
+	--color-quant-frame: #4aa3ff;
+	--color-accent-2: #e8e6df;
 	--color-quote: #5fffd7;
 
 	--font-serif:
@@ -73,8 +115,44 @@
 }
 
 @layer base {
-	html {
+	:root,
+	[data-theme="dark"] {
 		color-scheme: dark;
+		--color-bg: #1c1c1a;
+		--color-surface: #262624;
+		--color-text: #e8e6df;
+		--color-muted: #aaa69d;
+		--color-border: rgb(232 230 223 / 0.12);
+		--color-link: #5fffd7;
+		--color-code-bg: #20201e;
+		--color-card-bg: #242422;
+		--color-faint: rgb(232 230 223 / 0.12);
+		--color-global-bg: var(--color-bg);
+		--color-global-text: var(--color-text);
+		--color-accent: var(--color-link);
+		--color-accent-2: var(--color-text);
+		--color-quote: var(--color-link);
+	}
+
+	[data-theme="light"] {
+		color-scheme: light;
+		--color-bg: #f7f4ed;
+		--color-surface: #fbfaf7;
+		--color-text: #2f2f2f;
+		--color-muted: #66615a;
+		--color-border: rgb(47 47 47 / 0.12);
+		--color-link: #2f6f67;
+		--color-code-bg: #eee9df;
+		--color-card-bg: #fbfaf7;
+		--color-faint: rgb(47 47 47 / 0.12);
+		--color-global-bg: var(--color-bg);
+		--color-global-text: var(--color-text);
+		--color-accent: var(--color-link);
+		--color-accent-2: var(--color-text);
+		--color-quote: #2f6f67;
+	}
+
+	html {
 		accent-color: var(--color-accent);
 		background: var(--color-global-bg);
 		scrollbar-gutter: stable;
@@ -115,10 +193,12 @@
 @layer components {
 	@import "./components/admonition.css";
 	@import "./components/github-card.css";
+	@import "./layout.css";
+	@import "./prose.css";
 
 	.cactus-link {
 		@apply underline underline-offset-2 hover:decoration-2;
-		text-decoration-color: rgb(95 255 215 / 0.45);
+		text-decoration-color: color-mix(in srgb, var(--color-link) 45%, transparent);
 	}
 
 	.cactus-link:hover {
@@ -130,6 +210,17 @@
 		@apply text-accent-2 font-serif text-2xl font-normal;
 		letter-spacing: 0;
 	}
+
+	.article-page {
+		background:
+			radial-gradient(circle at top left, rgb(120 120 160 / 0.08), transparent 32%),
+			radial-gradient(circle at bottom right, rgb(120 120 120 / 0.06), transparent 28%),
+			var(--color-bg);
+	}
+
+	.article-content {
+		animation: page-enter 180ms ease-out both;
+	}
 }
 
 @utility prose {
@@ -138,8 +229,25 @@
 	--tw-prose-bullets: var(--color-global-text);
 	--tw-prose-code: var(--color-global-text);
 	--tw-prose-headings: var(--color-accent-2);
-	--tw-prose-hr: 0.5px solid rgb(232 230 224 / 0.1);
+	--tw-prose-hr: 0.5px solid var(--color-border);
 	--tw-prose-links: var(--color-global-text);
 	--tw-prose-quotes: var(--color-quote);
-	--tw-prose-th-borders: rgb(232 230 224 / 0.16);
+	--tw-prose-th-borders: var(--color-border);
+}
+
+@keyframes page-enter {
+	from {
+		opacity: 0;
+		transform: translateY(4px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.article-content {
+		animation: none;
+	}
 }

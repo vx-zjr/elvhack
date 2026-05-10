@@ -1,0 +1,18 @@
+---
+interface Props {
+	class?: string;
+	variant?: "default" | "wide" | "narrow";
+}
+
+const { class: className, variant = "default" } = Astro.props;
+const shellClass =
+	variant === "wide"
+		? "page-shell site-shell-wide"
+		: variant === "narrow"
+			? "page-shell content-shell"
+			: "page-shell site-shell";
+---
+
+<div class:list={[shellClass, className]}>
+	<slot />
+</div>

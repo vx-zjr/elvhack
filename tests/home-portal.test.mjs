@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
 const component = readFileSync("src/components/home/ShaderStage.astro", "utf8");
+const globalStyles = readFileSync("src/styles/global.css", "utf8");
 const styles = readFileSync("src/styles/shader-stage.css", "utf8");
 const runtime = readFileSync("src/scripts/shader-stage.ts", "utf8");
 
@@ -15,6 +16,10 @@ test("home portal uses vertical single-entry panels", () => {
 	assert.doesNotMatch(component, />TECHNOLOGY</);
 	assert.match(component, /class="portal-brand/);
 	assert.match(component, /class="portal-letter"/);
+	assert.match(component, /portal-title__slice portal-title__slice--left/);
+	assert.match(component, /portal-title__slice portal-title__slice--right/);
+	assert.doesNotMatch(component, /portal-title__slash/);
+	assert.match(component, /portal-title__border/);
 	assert.match(component, /向下滑/);
 	assert.match(component, /SCROLL DOWN/);
 	assert.match(component, /向上滑/);
@@ -34,6 +39,23 @@ test("home portal has left-top typography, quiet vertical hints, and no custom c
 	assert.match(styles, /portal-title__ghost/);
 	assert.match(styles, /@keyframes letter-roll/);
 	assert.match(styles, /@keyframes brand-cycle/);
+	assert.match(styles, /@keyframes portal-slice-left/);
+	assert.match(styles, /@keyframes portal-slice-right/);
+	assert.doesNotMatch(styles, /@keyframes portal-slash/);
+	assert.match(styles, /@keyframes portal-border-top/);
+	assert.match(styles, /margin-bottom:\s*clamp\(26px,\s*3\.4vw,\s*54px\)/);
+	assert.match(styles, /portal-panel--technology[\s\S]*translate3d\(6vw/);
+});
+
+test("home portal gives QUANT a blue frame while TECH keeps the accent frame", () => {
+	assert.match(globalStyles, /--color-quant-frame:\s*#4aa3ff/);
+	assert.match(styles, /\.portal-panel\s*{[\s\S]*--portal-frame-color:\s*var\(--color-accent\)/);
+	assert.match(
+		styles,
+		/\.portal-panel--quant\s*{[\s\S]*--portal-frame-color:\s*var\(--color-quant-frame\)/,
+	);
+	assert.doesNotMatch(styles, /\.portal-panel--technology\s*{[\s\S]*--portal-frame-color:/);
+	assert.match(styles, /\.portal-title__border span\s*{[\s\S]*var\(--portal-frame-color\)/);
 });
 
 test("home portal runtime supports scroll swipe keyboard switching and letter rolling", () => {

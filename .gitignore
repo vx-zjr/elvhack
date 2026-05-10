@@ -27,3 +27,5 @@ pnpm-debug.log*
 .env.local
 node_modules/.vite/
 .astro
+.superpowers/
+docs/superpowers/

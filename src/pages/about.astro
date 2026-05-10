@@ -1,5 +1,7 @@
 ---
-import PageLayout from "@/layouts/Base.astro";
+import PageShell from "@/components/layout/PageShell.astro";
+import SurfaceCard from "@/components/layout/SurfaceCard.astro";
+import BaseLayout from "@/layouts/Base.astro";
 
 const meta = {
 	description: "About elvhack",
@@ -7,12 +9,50 @@ const meta = {
 };
 ---
 
-<PageLayout meta={meta}>
-	<section class="max-w-xl">
-		<p class="mb-4 text-[11px] tracking-[0.28em] text-muted uppercase">about</p>
-		<h1 class="title mb-8">TBD</h1>
-		<p class="font-serif text-lg leading-8 text-global-text/85">
-			This page is intentionally quiet for now.
-		</p>
-	</section>
-</PageLayout>
+<BaseLayout meta={meta}>
+	<PageShell class="info-grid" variant="wide">
+		<section>
+			<p class="page-kicker">About</p>
+			<h1 class="page-title">A quiet research system for long-form technical work.</h1>
+			<p class="page-description">
+				elvhack is a personal technical blog and knowledge base for AI, quant research, OSINT,
+				security, engineering systems, and personal operating systems.
+			</p>
+			<div class="mt-8 grid gap-4">
+				<SurfaceCard>
+					<h2 class="sidebar-title">Principles</h2>
+					<p class="mt-3 text-sm leading-6 text-muted">
+						Content first, low visual noise, explicit structure, durable notes, and reproducible
+						engineering habits.
+					</p>
+				</SurfaceCard>
+				<SurfaceCard>
+					<h2 class="sidebar-title">Writing</h2>
+					<p class="mt-3 text-sm leading-6 text-muted">
+						Posts are treated as research artifacts: useful now, easy to revise later, and
+						connected to longer-running themes.
+					</p>
+				</SurfaceCard>
+			</div>
+		</section>
+		<aside class="grid gap-4">
+			<SurfaceCard>
+				<h2 class="sidebar-title">Current Focus</h2>
+				<ul class="mt-3 grid gap-2 text-sm leading-6 text-muted">
+					<li>AI-assisted research workflows</li>
+					<li>Quant systems and execution notes</li>
+					<li>OSINT process design</li>
+					<li>Long-term personal knowledge systems</li>
+				</ul>
+			</SurfaceCard>
+			<SurfaceCard>
+				<h2 class="sidebar-title">Index</h2>
+				<div class="mt-3 flex flex-wrap gap-2">
+					<a class="tag-pill" href="/links/">Links</a>
+					<a class="tag-pill" href="/projects/">Projects</a>
+					<a class="tag-pill" href="/rss.xml">RSS</a>
+				</div>
+			</SurfaceCard>
+		</aside>
+	</PageShell>
+</BaseLayout>

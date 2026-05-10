@@ -1,14 +1,16 @@
 ---
 import { type CollectionEntry, render } from "astro:content";
 
-import Masthead from "@/components/blog/Masthead.astro";
-import TOC from "@/components/blog/TOC.astro";
+import ArticleMeta from "@/components/blog/ArticleMeta.astro";
+import ArticleToc from "@/components/blog/ArticleToc.astro";
 import WebMentions from "@/components/blog/webmentions/index.astro";
+import PageShell from "@/components/layout/PageShell.astro";
 import {
 	findTranslation,
 	getAllPosts,
 	getAlternateLang,
 	getCategoryUrl,
+	getPostLikeSlug,
 	getPostUrl,
 	languageMeta,
 } from "@/data/post";
@@ -21,9 +23,10 @@ interface Props {
 }
 
 const { noindex = false, post } = Astro.props;
-const { ogImage, title, description, updatedDate, publishDate } = post.data;
+const { ogImage, title, description, updatedDate, publishDate, tags } = post.data;
 const socialImage = ogImage ?? `/og-image/${post.id}.png`;
-const articleDate = updatedDate?.toISOString() ?? publishDate.toISOString();
+const articleDate = publishDate.toISOString();
+const articleUpdatedDate = updatedDate?.toISOString();
 const { headings, remarkPluginFrontmatter } = await render(post);
 const readingTime: string = remarkPluginFrontmatter.readingTime;
 const allPosts = await getAllPosts();
@@ -40,12 +43,16 @@ const alternateLinks = [
 		? [{ href: getPostUrl(translation), hreflang: languageMeta[translation.data.lang].htmlLang }]
 		: []),
 ];
+const likeSlug = getPostLikeSlug(post);
 ---
 
 <BaseLayout
+	bodyClass="article-page"
 	meta={{
 		alternateLinks,
 		articleDate,
+		articleTags: tags,
+		articleUpdatedDate,
 		canonical: getPostUrl(post),
 		description,
 		lang: post.data.lang,
@@ -55,39 +62,57 @@ const alternateLinks = [
 		title,
 	}}
 >
-	<article class="grow break-words" data-pagefind-body>
-		<div id="blog-hero" class="mb-12">
-			<Masthead content={post} readingTime={readingTime} />
-			<div class="mt-5 border-t border-faint pt-4 text-xs text-muted">
-				{
-					translation ? (
-						<a class="cactus-link" href={translationHref}>
-							{translationLabel}
-						</a>
-					) : (
-						<>
-							<span>{translationFallback}</span>
-							<span aria-hidden="true"> / </span>
-							<a class="cactus-link" href={translationHref}>
-								{translationLabel}
-							</a>
-						</>
-					)
-				}
+	<PageShell variant="wide">
+		<article class="article-layout article-content" data-pagefind-body>
+			<aside class="article-meta" aria-label="Article metadata">
+				<ArticleMeta likeSlug={likeSlug} post={post} readingTime={readingTime} showLike />
+			</aside>
+
+			<div class="article-main">
+				<header class="article-header" id="blog-hero">
+					<p class="page-kicker">{post.data.category}</p>
+					<h1 class="article-title">{title}</h1>
+					{description && <p class="article-description">{description}</p>}
+					<div class="article-mobile-meta">
+						<ArticleMeta compact likeSlug={likeSlug} post={post} readingTime={readingTime} showLike />
+					</div>
+					<div class="mt-5 border-t border-faint pt-4 text-xs text-muted">
+						{
+							translation ? (
+								<a class="cactus-link" href={translationHref}>
+									{translationLabel}
+								</a>
+							) : (
+								<>
+									<span>{translationFallback}</span>
+									<span aria-hidden="true"> / </span>
+									<a class="cactus-link" href={translationHref}>
+										{translationLabel}
+									</a>
+								</>
+							)
+						}
+					</div>
+				</header>
+
+				<div class="prose">
+					<slot />
+					<WebMentions />
+				</div>
 			</div>
-		</div>
-		<div class="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between">
-			{!!headings.length && <TOC headings={headings} />}
-			<div
-				class="prose prose-sm max-w-full prose-headings:font-semibold prose-headings:text-accent-2 prose-headings:before:absolute prose-headings:before:-ms-4 prose-headings:before:text-muted prose-headings:hover:before:text-accent prose-pre:overflow-x-auto prose-table:block prose-table:overflow-x-auto sm:prose-headings:before:content-['#'] sm:prose-th:before:content-none"
-			>
-				<slot />
-				<WebMentions />
-			</div>
-		</div>
-	</article>
+
+			{
+				headings.length > 0 && (
+					<aside class="article-toc" aria-label="Article table of contents">
+						<ArticleToc headings={headings} />
+					</aside>
+				)
+			}
+		</article>
+	</PageShell>
+
 	<button
-		class="hover:border-link fixed end-4 bottom-8 z-90 flex h-10 w-10 translate-y-28 cursor-pointer items-center justify-center rounded-full border-2 border-transparent bg-zinc-200 text-3xl opacity-0 transition-all transition-discrete duration-300 data-[show=true]:translate-y-0 data-[show=true]:opacity-100 sm:end-8 sm:h-12 sm:w-12 dark:bg-zinc-700"
+		class="hover:border-link fixed end-4 bottom-8 z-90 flex h-10 w-10 translate-y-28 cursor-pointer items-center justify-center rounded-full border-2 border-transparent bg-surface text-3xl opacity-0 transition-all transition-discrete duration-300 data-[show=true]:translate-y-0 data-[show=true]:opacity-100 sm:end-8 sm:h-12 sm:w-12"
 		data-show="false"
 		id="to-top-btn"
 	>
@@ -113,7 +138,6 @@ const alternateLinks = [
 
 	function callback(entries: IntersectionObserverEntry[]) {
 		entries.forEach((entry) => {
-			// only show the scroll to top button when the heading is out of view
 			scrollBtn.dataset.show = (!entry.isIntersecting).toString();
 		});
 	}

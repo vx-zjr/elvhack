@@ -1,0 +1,45 @@
+---
+import type { CollectionEntry } from "astro:content";
+import FormattedDate from "@/components/FormattedDate.astro";
+import { getPostLikeSlug, getPostUrl } from "@/data/post";
+
+interface Props {
+	compact?: boolean;
+	post: CollectionEntry<"post">;
+	showCategory?: boolean;
+}
+
+const { compact = false, post, showCategory = false } = Astro.props;
+const likeSlug = getPostLikeSlug(post);
+const tags = post.data.tags.slice(0, compact ? 2 : 4);
+---
+
+<article
+	class:list={["article-list-item", compact && "article-list-item--compact"]}
+	data-like-slug={likeSlug}
+	data-post-item
+	data-published={post.data.publishDate.toISOString()}
+>
+	<h2 class="article-list-title">
+		<a href={getPostUrl(post)}>{post.data.title}</a>
+	</h2>
+	{
+		post.data.description && (
+			<p class="article-list-description">
+				{post.data.description}
+			</p>
+		)
+	}
+	<div class="article-list-meta">
+		<FormattedDate date={post.data.publishDate} />
+		{showCategory && <span>{post.data.category}</span>}
+		{
+			tags.map((tag) => (
+				<a class="tag-pill" href={`/${post.data.lang}/tags/${tag}/`}>
+					#{tag}
+				</a>
+			))
+		}
+		<span data-list-like-count data-like-slug={likeSlug}>0 likes</span>
+	</div>
+</article>

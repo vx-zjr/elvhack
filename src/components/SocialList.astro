@@ -1,39 +1,29 @@
 ---
 import { Icon } from "astro-icon/components";
+import { siteLinks } from "@/data/links";
 
 /** 
 	Uses https://www.astroicon.dev/getting-started/
 	Find icons via guide: https://www.astroicon.dev/guides/customization/#open-source-icon-sets
 	Only installed pack is: @iconify-json/mdi
 */
-const socialLinks: {
-	friendlyName: string;
-	isWebmention?: boolean;
-	link: string;
-	name: string;
-}[] = [
-	{
-		friendlyName: "Github",
-		link: "https://github.com/chrismwilliams/astro-cactus",
-		name: "mdi:github",
-	},
-];
+const socialLinks = siteLinks.filter((link) => link.url);
 ---
 
 <div class="flex flex-wrap items-end gap-x-2">
 	<p>Find me on</p>
 	<ul class="flex flex-1 items-center gap-x-2 sm:flex-initial">
 		{
-			socialLinks.map(({ friendlyName, isWebmention, link, name }) => (
+			socialLinks.map((link) => (
 				<li class="flex">
 					<a
 						class="hover:text-link inline-block"
-						href={link}
-						rel={`noreferrer ${isWebmention ? "me authn" : ""}`}
-						target="_blank"
+						href={link.url}
+						rel={link.external ? "noopener noreferrer" : undefined}
+						target={link.external ? "_blank" : undefined}
 					>
-						<Icon aria-hidden="true" class="h-8 w-8" focusable="false" name={name} />
-						<span class="sr-only">{friendlyName}</span>
+						<Icon aria-hidden="true" class="h-8 w-8" focusable="false" name={link.icon} />
+						<span class="sr-only">{link.name}</span>
 					</a>
 				</li>
 			))

@@ -1,4 +1,5 @@
 ---
+import ThemeToggle from "@/components/ThemeToggle.astro";
 import { detectPreferredLang, getCategoryUrl, type PostLang } from "@/data/post";
 import { siteConfig } from "@/site.config";
 
@@ -8,36 +9,43 @@ interface Props {
 
 const currentLang = Astro.props.lang ?? detectPreferredLang(Astro.url.pathname.split("/")[1]);
 const otherLang = currentLang === "zh" ? "en" : "zh";
+const pathname = Astro.url.pathname;
+const technologyUrl = getCategoryUrl(currentLang, "technology");
+const quantUrl = getCategoryUrl(currentLang, "quant");
 const links = [
-	{ path: "/", title: "home" },
-	{ path: getCategoryUrl(currentLang, "quant"), title: "quant" },
-	{ path: getCategoryUrl(currentLang, "technology"), title: "technology" },
-	{ path: getCategoryUrl(otherLang, "technology"), title: otherLang },
+	{ active: pathname === "/", path: "/", title: "home" },
+	{ active: pathname.startsWith(technologyUrl), path: technologyUrl, title: "TECHNOLOGY" },
+	{ active: pathname.startsWith(quantUrl), path: quantUrl, title: "QUANT" },
+	{ active: pathname.startsWith("/projects/"), path: "/projects/", title: "projects" },
+	{ active: pathname.startsWith("/links/"), path: "/links/", title: "links" },
+	{ active: false, path: getCategoryUrl(otherLang, "technology"), title: otherLang },
 ];
 ---
 
-<header class="mb-20 flex items-baseline justify-between gap-6 border-b border-faint pb-5">
-	<a
-		aria-current={Astro.url.pathname === "/" ? "page" : false}
-		class="font-serif text-lg italic tracking-normal text-global-text"
-		href="/"
-	>
-		<b class="font-medium not-italic text-accent">elv</b>{siteConfig.title.replace("elv", "")}
-	</a>
-	<nav
-		aria-label="Main menu"
-		class="flex flex-wrap items-center justify-end gap-x-5 gap-y-2 text-[11px] tracking-[0.18em] text-muted uppercase"
-	>
-		{
-			links.map((link) => (
-				<a
-					aria-current={Astro.url.pathname === link.path ? "page" : false}
-					class="hover:text-global-text aria-current:text-accent"
-					href={link.path}
-				>
-					{link.title}
-				</a>
-			))
-		}
-	</nav>
+<header class="site-header">
+	<div class="site-header__inner site-shell-wide">
+		<a
+			aria-current={pathname === "/" ? "page" : false}
+			class="site-header__brand"
+			href="/"
+		>
+			<b class="font-medium not-italic text-accent">elv</b>{siteConfig.title.replace("elv", "")}
+		</a>
+		<div class="site-header__right">
+			<nav aria-label="Main menu" class="site-header__nav">
+				{
+					links.map((link) => (
+						<a
+							aria-current={link.active ? "page" : false}
+							class="site-header__link"
+							href={link.path}
+						>
+							{link.title}
+						</a>
+					))
+				}
+			</nav>
+			<ThemeToggle />
+		</div>
+	</div>
 </header>
