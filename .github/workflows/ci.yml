@@ -22,3 +22,4 @@ jobs:
         with:
           args: --no-progress --exclude '^https://(elvhack\.vx-zjr-v\.workers\.dev|elvhack\.com)' "src/content/**/*.md" "docs/**/*.md" README.md AGENTS.md
           failIfEmpty: false
+#无聊的注释
