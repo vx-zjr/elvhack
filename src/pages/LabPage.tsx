@@ -1,10 +1,11 @@
 import { Cpu, Database, Gauge, Wand2 } from 'lucide-react';
+import { InteractionPanel } from '../components/InteractionPanel';
 
 const experiments = [
-  { title: 'Edge BFF', body: 'Cloudflare Pages Functions isolate privileged Supabase writes behind normalized JSON APIs.', icon: Cpu },
-  { title: 'Visual runtime', body: 'Canvas-driven first viewport proves motion without turning the whole site into a heavy WebGL dependency.', icon: Wand2 },
-  { title: 'Content plane', body: 'Supabase stores drafts, published posts, comments, reactions, and audit events.', icon: Database },
-  { title: 'Budget discipline', body: 'The site avoids SSR and expensive transforms inside Functions to protect request CPU time.', icon: Gauge }
+  { slug: 'edge-bff', title: 'Edge BFF', body: 'Cloudflare Pages Functions isolate privileged Supabase writes behind normalized JSON APIs.', icon: Cpu },
+  { slug: 'visual-runtime', title: 'Visual runtime', body: 'Canvas-driven first viewport proves motion without turning the whole site into a heavy WebGL dependency.', icon: Wand2 },
+  { slug: 'content-plane', title: 'Content plane', body: 'Supabase stores drafts, published posts, comments, reactions, and audit events.', icon: Database },
+  { slug: 'budget-discipline', title: 'Budget discipline', body: 'The site avoids SSR and expensive transforms inside Functions to protect request CPU time.', icon: Gauge }
 ];
 
 export function LabPage() {
@@ -20,6 +21,7 @@ export function LabPage() {
               <Icon className="text-signal" size={24} aria-hidden="true" />
               <h2 className="mt-5 text-2xl font-semibold text-white">{item.title}</h2>
               <p className="mt-3 leading-7 text-paper/68">{item.body}</p>
+              <InteractionPanel compact label={item.title} targetSlug={item.slug} targetType="project" />
             </article>
           );
         })}

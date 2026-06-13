@@ -1,5 +1,6 @@
 import { reactionSchema } from './_shared/schemas';
 import { jsonError, jsonOk, parseJson, withErrorBoundary } from './_shared/http';
+import { withInteractionTarget } from './_shared/interactions';
 import { supabaseRest } from './_shared/supabase';
 import type { Env } from './_shared/types';
 
@@ -11,11 +12,12 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) =>
     }
     const result = await supabaseRest(env, 'reactions?select=*', {
       method: 'POST',
-      headers: { prefer: 'return=representation' },
-      body: JSON.stringify(parsed.data)
+      headers: { prefer: 'resolution=ignore-duplicates,return=representation' },
+      body: JSON.stringify(withInteractionTarget(parsed.data))
     });
     if (!result.ok) {
       return jsonError('UPSTREAM_ERROR', result.message, result.status);
     }
-    return jsonOk({ reaction: Array.isArray(result.data) ? result.data[0] : result.data }, 201);
+    const reaction = Array.isArray(result.data) ? result.data[0] : result.data;
+    return jsonOk({ reaction, recorded: Boolean(reaction) }, reaction ? 201 : 200);
   });

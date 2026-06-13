@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { jsonError, jsonOk, parseJson, requireAdmin } from '../../functions/api/_shared/http';
-import { createPostSchema, normalizeSlug } from '../../functions/api/_shared/schemas';
+import { commentSchema, createPostSchema, normalizeSlug, reactionSchema } from '../../functions/api/_shared/schemas';
 
 const env = {
   VITE_SUPABASE_URL: 'https://example.supabase.co',
@@ -42,6 +42,43 @@ describe('request validation', () => {
 
   it('normalizes slugs for public URLs', () => {
     expect(normalizeSlug(' Edge Runtime: Notes ')).toBe('edge-runtime-notes');
+  });
+
+  it('accepts anonymous comments for post and project targets', () => {
+    expect(
+      commentSchema.safeParse({
+        target_type: 'post',
+        target_slug: 'building-elvhack-on-the-edge',
+        body: 'This was useful.'
+      }).success
+    ).toBe(true);
+    expect(
+      commentSchema.safeParse({
+        target_type: 'project',
+        target_slug: 'edge-bff',
+        body: 'Ship this experiment.'
+      }).success
+    ).toBe(true);
+  });
+
+  it('accepts anonymous likes for post and project targets', () => {
+    const anonymousId = '10000000-0000-4000-8000-000000000001';
+    expect(
+      reactionSchema.safeParse({
+        target_type: 'post',
+        target_slug: 'building-elvhack-on-the-edge',
+        anonymous_id: anonymousId,
+        kind: 'like'
+      }).success
+    ).toBe(true);
+    expect(
+      reactionSchema.safeParse({
+        target_type: 'project',
+        target_slug: 'edge-bff',
+        anonymous_id: anonymousId,
+        kind: 'like'
+      }).success
+    ).toBe(true);
   });
 });
 

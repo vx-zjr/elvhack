@@ -50,26 +50,38 @@ create table if not exists public.post_tags (
 
 create table if not exists public.comments (
   id uuid primary key default gen_random_uuid(),
-  post_id uuid not null references public.posts(id) on delete cascade,
+  post_id uuid references public.posts(id) on delete cascade,
+  target_type text not null default 'post' check (target_type in ('post', 'project')),
+  target_slug text,
   author_name text not null check (char_length(author_name) between 1 and 80),
   author_email text,
   body text not null check (char_length(body) between 1 and 2000),
   status text not null default 'pending' check (status in ('pending', 'approved', 'rejected')),
   created_at timestamptz not null default now(),
   moderated_at timestamptz,
-  moderated_by_github_username text
+  moderated_by_github_username text,
+  check (post_id is not null or target_slug is not null)
 );
 
 create index if not exists comments_post_status_idx on public.comments (post_id, status, created_at desc);
+create index if not exists comments_target_status_idx on public.comments (target_type, target_slug, status, created_at desc);
 
 create table if not exists public.reactions (
   id uuid primary key default gen_random_uuid(),
-  post_id uuid not null references public.posts(id) on delete cascade,
-  kind text not null check (kind in ('spark', 'useful', 'mindblown')),
-  created_at timestamptz not null default now()
+  post_id uuid references public.posts(id) on delete cascade,
+  target_type text not null default 'post' check (target_type in ('post', 'project')),
+  target_slug text,
+  anonymous_id uuid,
+  kind text not null check (kind in ('like', 'spark', 'useful', 'mindblown')),
+  created_at timestamptz not null default now(),
+  check (post_id is not null or target_slug is not null)
 );
 
 create index if not exists reactions_post_kind_idx on public.reactions (post_id, kind);
+create index if not exists reactions_target_kind_idx on public.reactions (target_type, target_slug, kind);
+create unique index if not exists reactions_unique_anonymous_target_idx
+  on public.reactions (target_type, coalesce(target_slug, ''), coalesce(post_id, '00000000-0000-0000-0000-000000000000'::uuid), kind, anonymous_id)
+  where anonymous_id is not null;
 
 create table if not exists public.page_views (
   id uuid primary key default gen_random_uuid(),

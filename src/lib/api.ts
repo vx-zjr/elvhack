@@ -25,6 +25,20 @@ export interface PostDetail extends PostSummary {
   content: string;
 }
 
+export interface PublicComment {
+  id: string;
+  author_name: string;
+  body: string;
+  created_at: string;
+}
+
+export interface InteractionSummary {
+  comments: PublicComment[];
+  reactions: {
+    like: number;
+  };
+}
+
 export async function apiGet<T>(path: string, token?: string): Promise<ApiResponse<T>> {
   const response = await fetch(path, {
     headers: token ? { authorization: `Bearer ${token}` } : undefined

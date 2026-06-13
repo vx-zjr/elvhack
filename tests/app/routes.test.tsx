@@ -65,4 +65,62 @@ describe('public route shell', () => {
     expect(await screen.findByText('Live Supabase Dispatch')).toBeInTheDocument();
     expect(screen.getByText('This headline came from the live edge API.')).toBeInTheDocument();
   });
+
+  it('renders approved comments and like controls on article detail pages', async () => {
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
+      const url = typeof input === 'string' ? input : input.url;
+      if (url.includes('/api/interactions?')) {
+        return new Response(
+          JSON.stringify({
+            ok: true,
+            data: {
+              comments: [{ id: 'comment-1', author_name: 'Anonymous', body: 'Edge notes landed cleanly.', created_at: '2026-06-13T00:00:00.000Z' }],
+              reactions: { like: 7 }
+            }
+          }),
+          { status: 200, headers: { 'content-type': 'application/json' } }
+        );
+      }
+      return new Response(JSON.stringify({ ok: false, error: { code: 'OFFLINE', message: 'offline' } }), { status: 500, headers: { 'content-type': 'application/json' } });
+    });
+
+    render(
+      <MemoryRouter initialEntries={['/blog/building-elvhack-on-the-edge']}>
+        <App />
+      </MemoryRouter>
+    );
+
+    expect(await screen.findByText('Edge notes landed cleanly.')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /like 7/i })).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/add an anonymous note/i)).toBeInTheDocument();
+  });
+
+  it('renders anonymous project comments and likes in the lab', async () => {
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
+      const url = typeof input === 'string' ? input : input.url;
+      if (url.includes('/api/interactions?target_type=project&target_slug=edge-bff')) {
+        return new Response(
+          JSON.stringify({
+            ok: true,
+            data: {
+              comments: [{ id: 'project-comment-1', author_name: 'Anonymous', body: 'The edge BFF is the right boundary.', created_at: '2026-06-13T00:00:00.000Z' }],
+              reactions: { like: 3 }
+            }
+          }),
+          { status: 200, headers: { 'content-type': 'application/json' } }
+        );
+      }
+      return new Response(JSON.stringify({ ok: true, data: { comments: [], reactions: { like: 0 } } }), { status: 200, headers: { 'content-type': 'application/json' } });
+    });
+
+    render(
+      <MemoryRouter initialEntries={['/lab']}>
+        <App />
+      </MemoryRouter>
+    );
+
+    expect(await screen.findByText('The edge BFF is the right boundary.')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /like 3/i })).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/comment on edge bff/i)).toBeInTheDocument();
+  });
 });

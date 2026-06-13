@@ -49,6 +49,36 @@ export async function supabaseRest<T>(
   return { ok: true, data: (await response.json()) as T };
 }
 
+export async function supabaseCount(
+  env: Env,
+  path: string,
+  fetcher: Fetcher = fetch
+): Promise<{ ok: true; count: number } | { ok: false; status: number; message: string }> {
+  const config = getSupabaseConfig(env);
+  if (!config) {
+    return { ok: false, status: 500, message: 'Supabase service configuration is missing.' };
+  }
+
+  const response = await fetcher(`${config.url}/rest/v1/${path}`, {
+    method: 'GET',
+    headers: {
+      apikey: config.serviceRoleKey,
+      authorization: `Bearer ${config.serviceRoleKey}`,
+      accept: 'application/json',
+      prefer: 'count=exact'
+    }
+  });
+
+  if (!response.ok) {
+    const message = await response.text();
+    return { ok: false, status: response.status, message: message || 'Supabase count request failed.' };
+  }
+
+  const range = response.headers.get('content-range');
+  const total = range?.split('/')[1];
+  return { ok: true, count: total && total !== '*' ? Number(total) : 0 };
+}
+
 export function encodeFilterValue(value: string): string {
   return encodeURIComponent(value.replace(/\*/g, ''));
 }

@@ -33,15 +33,35 @@ export const publishPostSchema = z.object({
 });
 
 export const commentSchema = z.object({
-  post_id: z.string().uuid(),
-  author_name: z.string().trim().min(1).max(80),
+  post_id: z.string().uuid().optional(),
+  target_type: z.enum(['post', 'project']).default('post'),
+  target_slug: slugSchema.optional(),
+  author_name: z.string().trim().min(1).max(80).default('Anonymous'),
   author_email: z.string().email().max(160).optional(),
   body: z.string().trim().min(1).max(2000)
+}).refine((value) => Boolean(value.post_id || value.target_slug), {
+  message: 'Comment target is required.',
+  path: ['target_slug']
 });
 
 export const reactionSchema = z.object({
-  post_id: z.string().uuid(),
-  kind: z.enum(['spark', 'useful', 'mindblown'])
+  post_id: z.string().uuid().optional(),
+  target_type: z.enum(['post', 'project']).default('post'),
+  target_slug: slugSchema.optional(),
+  anonymous_id: z.string().uuid().optional(),
+  kind: z.enum(['like', 'spark', 'useful', 'mindblown']).default('like')
+}).refine((value) => Boolean(value.post_id || value.target_slug), {
+  message: 'Reaction target is required.',
+  path: ['target_slug']
+});
+
+export const interactionQuerySchema = z.object({
+  target_type: z.enum(['post', 'project']).default('post'),
+  target_slug: slugSchema.optional(),
+  post_id: z.string().uuid().optional()
+}).refine((value) => Boolean(value.post_id || value.target_slug), {
+  message: 'Interaction target is required.',
+  path: ['target_slug']
 });
 
 export const pageViewSchema = z.object({

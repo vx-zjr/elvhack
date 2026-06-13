@@ -10,7 +10,7 @@ Core features:
 
 - Immersive public homepage with animated technical atmosphere and direct paths to writing, lab work, and biography.
 - Public blog index and article detail pages backed by Supabase content.
-- Public lab and about pages for experiments, technical identity, and project context.
+- Public lab and about pages for experiments, technical identity, project context, and project-level anonymous discussion.
 - Admin CMS for GitHub-authenticated, whitelisted users to create, edit, draft, publish, and unpublish posts.
 - Public reactions, comments, and page-view analytics through Cloudflare Pages Functions.
 
@@ -49,8 +49,9 @@ Edge constraints:
 - `PATCH /api/admin/posts/:id` - update an existing post. Admin only.
 - `POST /api/admin/posts/:id/publish` - publish or unpublish a post. Admin only.
 - `GET /api/admin/me` - validate the current Supabase session and GitHub whitelist status.
-- `POST /api/comments` - create a public comment pending moderation.
-- `POST /api/reactions` - upsert a public reaction event.
+- `GET /api/interactions` - fetch approved anonymous comments and like totals for a `post` or `project` target.
+- `POST /api/comments` - create an anonymous public comment pending moderation for a `post` or `project` target.
+- `POST /api/reactions` - upsert an anonymous public like/reaction event for a `post` or `project` target.
 - `POST /api/page-view` - record a bounded page-view analytics event.
 
 All API routes return the normalized shape:
@@ -76,8 +77,8 @@ Tables:
 - `posts`: title, slug, excerpt, markdown content, cover image, `draft` / `published` / `archived` status, timestamps, GitHub author fields.
 - `tags`: tag registry with unique names.
 - `post_tags`: many-to-many post/tag relationship.
-- `comments`: article comments with `pending` / `approved` / `rejected` moderation status.
-- `reactions`: lightweight reaction events with `spark`, `useful`, or `mindblown` kind.
+- `comments`: anonymous article/project comments with `target_type`, optional `target_slug` / `post_id`, and `pending` / `approved` / `rejected` moderation status.
+- `reactions`: lightweight anonymous article/project reaction events with `like`, `spark`, `useful`, or `mindblown` kind. Anonymous likes are deduplicated by local browser-generated UUID plus target.
 - `page_views`: bounded analytics event with path, optional slug/referrer, user-agent family, timestamp.
 - `audit_events`: admin action trail with actor, action, subject, metadata, timestamp.
 
