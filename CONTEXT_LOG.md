@@ -17,12 +17,14 @@
 - 2026-06-13: Started local Vite preview on `http://127.0.0.1:4173/` and Wrangler Pages dev on `http://127.0.0.1:8788/`. Confirmed homepage and SPA fallback return 200; API routes return structured JSON errors when Supabase env vars are absent.
 - 2026-06-13: First Cloudflare Pages deployment failed because Pages config validation rejects Worker-only `observability` in `wrangler.jsonc`; removed that field and documented the constraint.
 - 2026-06-13: Cloudflare Pages preview deployment `a4f8045b` and production deployment `f85c7773` succeeded after the config fix. Verified `https://elvhack.pages.dev/` returns 200 and `https://elvhack.pages.dev/api/posts` returns the expected structured Supabase configuration error until real credentials are set.
+- 2026-06-13: Bound Cloudflare-hosted apex domain `elvhack.com` to the Cloudflare Pages project `elvhack`. Created proxied apex CNAME `elvhack.com -> elvhack.pages.dev`. Verified `https://elvhack.com/` returns 200 with the deployed SPA and `http://elvhack.com/` redirects to HTTPS. Cloudflare Pages custom domain API still reports certificate validation as `pending`, while domain ownership verification is `active` and public HTTPS is serving correctly.
 
 ## Todo
 
 - Add real Supabase project credentials to `.env.local` and Cloudflare Pages environment variables.
 - Apply Supabase migration `20260613000000_initial_elvhack_cms.sql` to the target Supabase project.
 - Trigger and inspect the first Cloudflare Pages deployment after environment variables are configured.
+- Recheck Cloudflare Pages custom domain status until `elvhack.com` control-plane validation changes from `pending` to active.
 
 ## Known Constraints
 
