@@ -3,6 +3,7 @@ import '@testing-library/jest-dom/vitest';
 HTMLCanvasElement.prototype.getContext = (() => ({
   clearRect: () => undefined,
   createLinearGradient: () => ({ addColorStop: () => undefined }),
+  createRadialGradient: () => ({ addColorStop: () => undefined }),
   fillRect: () => undefined,
   beginPath: () => undefined,
   moveTo: () => undefined,

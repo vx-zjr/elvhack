@@ -13,6 +13,8 @@
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
 
+@custom-variant light (&:where([data-theme="light"], [data-theme="light"] *));
+
 :root {
   color: #f7f5ef;
   background: #10131a;
@@ -31,6 +33,10 @@ body {
   min-width: 320px;
   min-height: 100vh;
   background: linear-gradient(140deg, #10131a 0%, #171b24 48%, #202019 100%);
+}
+
+:root[data-theme="light"] body {
+  background: linear-gradient(140deg, #f7f5ef 0%, #eef7f5 48%, #fff4ec 100%);
 }
 
 a {
@@ -62,4 +68,41 @@ textarea {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 6px;
   padding: 0.1rem 0.35rem;
+}
+
+[data-theme="light"] .text-white,
+[data-theme="light"] .prose-lite h1,
+[data-theme="light"] .prose-lite h2,
+[data-theme="light"] .prose-lite h3 {
+  color: #10131a;
+}
+
+[data-theme="light"] .text-paper,
+[data-theme="light"] .text-paper\/35,
+[data-theme="light"] .text-paper\/42,
+[data-theme="light"] .text-paper\/46,
+[data-theme="light"] .text-paper\/50,
+[data-theme="light"] .text-paper\/54,
+[data-theme="light"] .text-paper\/55,
+[data-theme="light"] .text-paper\/60,
+[data-theme="light"] .text-paper\/62,
+[data-theme="light"] .text-paper\/68,
+[data-theme="light"] .text-paper\/70,
+[data-theme="light"] .text-paper\/78,
+[data-theme="light"] .prose-lite p {
+  color: rgba(16, 19, 26, 0.72);
+}
+
+[data-theme="light"] .bg-ink,
+[data-theme="light"] .bg-ink\/68,
+[data-theme="light"] .bg-ink\/70,
+[data-theme="light"] .bg-ink\/82 {
+  background-color: rgba(247, 245, 239, 0.72);
+}
+
+[data-theme="light"] .border-white\/10,
+[data-theme="light"] .border-white\/12,
+[data-theme="light"] .border-white\/14,
+[data-theme="light"] .border-white\/18 {
+  border-color: rgba(16, 19, 26, 0.12);
 }

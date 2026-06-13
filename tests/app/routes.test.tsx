@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import App from '../../src/App';
@@ -19,6 +19,23 @@ describe('public route shell', () => {
 
     expect(screen.getByRole('heading', { name: /^elvhack$/i, level: 1 })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /enter blog/i })).toHaveAttribute('href', '/blog');
+  });
+
+  it('renders a global interactive smoke background and theme toggle', () => {
+    vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('offline'));
+
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <App />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByTestId('global-smoke-background')).toBeInTheDocument();
+    const shell = screen.getByTestId('site-shell');
+    expect(shell).toHaveAttribute('data-theme', 'dark');
+    fireEvent.click(screen.getByRole('button', { name: /switch to light mode/i }));
+    expect(shell).toHaveAttribute('data-theme', 'light');
+    expect(screen.getByRole('button', { name: /switch to dark mode/i })).toBeInTheDocument();
   });
 
   it('renders the admin route with a GitHub login gate', () => {

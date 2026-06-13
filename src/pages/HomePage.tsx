@@ -1,7 +1,6 @@
 import { ArrowRight, Blocks, Braces, DatabaseZap, Orbit, RadioTower, Sparkles, TerminalSquare, Zap } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ImmersiveField } from '../components/ImmersiveField';
 import { fallbackSummaries } from '../data/fallback';
 import { apiGet, type PostSummary } from '../lib/api';
 
@@ -46,8 +45,7 @@ export function HomePage() {
   return (
     <div className="overflow-hidden">
       <section className="relative min-h-[calc(100vh-4rem)] overflow-hidden border-b border-white/10">
-        <ImmersiveField />
-        <div className="absolute inset-0 bg-[linear-gradient(105deg,rgba(16,19,26,0.97),rgba(16,19,26,0.62)_46%,rgba(29,29,20,0.9))]" />
+        <div className="absolute inset-0 bg-[linear-gradient(105deg,rgba(16,19,26,0.88),rgba(16,19,26,0.54)_46%,rgba(29,29,20,0.8))] light:bg-[linear-gradient(105deg,rgba(247,245,239,0.82),rgba(238,247,245,0.52)_46%,rgba(255,244,236,0.78))]" />
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-ink to-transparent" />
         <div className="relative mx-auto grid min-h-[calc(100vh-4rem)] max-w-7xl items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1.02fr_0.98fr] lg:px-8">
           <div className="max-w-4xl pt-10 lg:pt-0">
@@ -55,8 +53,8 @@ export function HomePage() {
               <span className="h-2 w-2 rounded-full bg-signal shadow-[0_0_18px_rgba(79,209,197,0.9)]" />
               Personal edge lab / dynamic blog
             </div>
-            <h1 className="mt-6 max-w-4xl text-6xl font-black leading-[0.88] text-white sm:text-8xl lg:text-[8.4rem]">elvhack</h1>
-            <p className="mt-7 max-w-2xl text-lg leading-8 text-paper/78 sm:text-xl">
+            <h1 className="mt-6 max-w-4xl text-6xl font-black leading-[0.88] text-white light:text-ink sm:text-8xl lg:text-[8.4rem]">elvhack</h1>
+            <p className="mt-7 max-w-2xl text-lg leading-8 text-paper/78 light:text-ink/72 sm:text-xl">
               A kinetic personal homepage for edge-native writing, experiments, and a compact CMS wired through Cloudflare Pages Functions and Supabase.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
@@ -83,18 +81,18 @@ export function HomePage() {
           </div>
           <div className="relative pb-10 lg:pb-0">
             <div className="absolute -left-10 top-8 hidden h-24 w-24 rotate-12 border border-signal/30 lg:block" />
-            <div className="rounded-md border border-white/12 bg-ink/68 p-4 shadow-2xl shadow-black/40 backdrop-blur-xl">
+            <div className="rounded-md border border-white/12 bg-ink/68 p-4 shadow-2xl shadow-black/40 backdrop-blur-xl light:border-ink/10 light:bg-paper/72 light:shadow-ink/10">
               <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                <div className="flex items-center gap-2 font-mono text-xs uppercase text-paper/54">
+                <div className="flex items-center gap-2 font-mono text-xs uppercase text-paper/54 light:text-ink/54">
                   <Orbit size={16} className="text-signal" aria-hidden="true" />
                   Signal board
                 </div>
                 <span className="rounded border border-signal/30 px-2 py-1 font-mono text-[10px] uppercase text-signal">Live edge</span>
               </div>
-              <Link to={`/blog/${leadPost.slug}`} className="group mt-5 block rounded-md border border-white/10 bg-white/[0.055] p-5 transition hover:border-signal/45 hover:bg-white/[0.08]">
+              <Link to={`/blog/${leadPost.slug}`} className="group mt-5 block rounded-md border border-white/10 bg-white/[0.055] p-5 transition hover:border-signal/45 hover:bg-white/[0.08] light:border-ink/10 light:bg-white/70 light:hover:bg-white">
                 <p className="font-mono text-xs uppercase text-ember">Latest dispatch</p>
-                <h2 className="mt-4 text-3xl font-bold leading-tight text-white group-hover:text-signal">{leadPost.title}</h2>
-                <p className="mt-4 leading-7 text-paper/68">{leadPost.excerpt}</p>
+                <h2 className="mt-4 text-3xl font-bold leading-tight text-white group-hover:text-signal light:text-ink">{leadPost.title}</h2>
+                <p className="mt-4 leading-7 text-paper/68 light:text-ink/68">{leadPost.excerpt}</p>
                 <span className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-signal">
                   Read signal
                   <ArrowRight size={16} aria-hidden="true" />
@@ -102,9 +100,9 @@ export function HomePage() {
               </Link>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 {featuredPosts.slice(1, 3).map((post) => (
-                  <Link key={post.id} to={`/blog/${post.slug}`} className="rounded-md border border-white/10 bg-white/[0.04] p-4 transition hover:border-ember/45 hover:bg-white/[0.07]">
-                    <p className="font-mono text-[10px] uppercase text-paper/42">Archive node</p>
-                    <h3 className="mt-3 text-base font-semibold leading-snug text-white">{post.title}</h3>
+                  <Link key={post.id} to={`/blog/${post.slug}`} className="rounded-md border border-white/10 bg-white/[0.04] p-4 transition hover:border-ember/45 hover:bg-white/[0.07] light:border-ink/10 light:bg-white/60 light:hover:bg-white">
+                    <p className="font-mono text-[10px] uppercase text-paper/42 light:text-ink/42">Archive node</p>
+                    <h3 className="mt-3 text-base font-semibold leading-snug text-white light:text-ink">{post.title}</h3>
                   </Link>
                 ))}
               </div>

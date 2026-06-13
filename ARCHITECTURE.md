@@ -8,7 +8,7 @@ The project is not a generic SaaS dashboard, static landing page, or broad CMS p
 
 Core features:
 
-- Immersive public homepage with animated technical atmosphere and direct paths to writing, lab work, and biography.
+- Global interactive smoke background with dark/light theme switching, plus an immersive public homepage with direct paths to writing, lab work, and biography.
 - Public blog index and article detail pages backed by Supabase content.
 - Public lab and about pages for experiments, technical identity, project context, and project-level anonymous discussion.
 - Admin CMS for GitHub-authenticated, whitelisted users to create, edit, draft, publish, and unpublish posts.
@@ -32,7 +32,7 @@ Edge constraints:
 
 ## 3. Frontend Route Tree
 
-- `/` - immersive homepage, live `/api/posts` featured writing with local fallback, lab highlights, status cards.
+- `/` - immersive homepage over the global interactive smoke field, live `/api/posts` featured writing with local fallback, lab highlights, status cards.
 - `/blog` - searchable public post index.
 - `/blog/:slug` - article detail with comments and reactions.
 - `/lab` - technical experiments and edge architecture showcase.
@@ -100,6 +100,8 @@ npx wrangler pages dev dist --compatibility-date 2026-06-13
 When the local system lacks `npm`, use the Codex bundled Node/npm shim already prepared under `work/npm-cli` during this rebuild session.
 
 Tailwind CSS uses the v4 CSS-first entry in `src/styles.css` with explicit `@source` declarations for `index.html` and `src/**/*.{ts,tsx}`. Keep theme tokens there so production builds include all utility classes used by the React routes.
+
+The global shell renders `SmokeBackground`, a fixed full-viewport canvas driven by browser pointer movement. Dark/light mode is controlled by `SiteLayout`, stored in `localStorage` as `elvhack.theme`, mirrored on `document.documentElement.dataset.theme`, and styled through the custom Tailwind `light:` variant plus global theme fallbacks in `src/styles.css`.
 
 ## 7. Development Memory Lifecycle
 
