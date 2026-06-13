@@ -32,7 +32,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, request }) =>
       return jsonError('UPSTREAM_ERROR', comments.message, comments.status);
     }
 
-    const likes = await supabaseCount(env, `reactions?select=id&${filters}&kind=eq.like`);
+    const likes = await supabaseCount(env, `reactions?select=id&${filters}&kind=eq.like&limit=1`);
     if (!likes.ok) {
       return jsonError('UPSTREAM_ERROR', likes.message, likes.status);
     }
