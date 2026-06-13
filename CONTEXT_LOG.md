@@ -15,6 +15,7 @@
 - 2026-06-13: Scaffolded Vite + React + TypeScript + Tailwind app, Cloudflare Pages Functions API, normalized Edge helpers, API tests, public routes, admin CMS routes, and Supabase initial migration.
 - 2026-06-13: Verified `npm run typecheck`, `npm run lint`, `npm run test`, and `npm run build` with the bundled Node/npm shim. Recreated GitHub repository `vx-zjr/elvhack`, pushed `main` and `feature/edge-cms-rebuild`, and created Cloudflare Pages project `elvhack` at `elvhack.pages.dev`.
 - 2026-06-13: Started local Vite preview on `http://127.0.0.1:4173/` and Wrangler Pages dev on `http://127.0.0.1:8788/`. Confirmed homepage and SPA fallback return 200; API routes return structured JSON errors when Supabase env vars are absent.
+- 2026-06-13: First Cloudflare Pages deployment failed because Pages config validation rejects Worker-only `observability` in `wrangler.jsonc`; removed that field and documented the constraint.
 
 ## Todo
 

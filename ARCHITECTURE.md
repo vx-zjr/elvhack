@@ -28,6 +28,7 @@ Edge constraints:
 - No `fs`, TCP Postgres drivers, or Node-only crypto in runtime code.
 - Edge functions use `fetch`, Web Crypto, Zod validation, and structured JSON responses.
 - Request CPU work must stay small and bounded; no SSR, no markdown compilation in Functions, and no unbounded loops over database rows.
+- Pages `wrangler.jsonc` must stay within Pages-supported fields. Do not place Worker-only `observability` config in this file.
 
 ## 3. Frontend Route Tree
 
