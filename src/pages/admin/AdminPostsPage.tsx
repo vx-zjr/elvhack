@@ -42,7 +42,7 @@ export function AdminPostsPage() {
     <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
-          <p className="font-mono text-sm uppercase tracking-[0.24em] text-ember">Admin</p>
+          <p className="font-mono text-sm uppercase text-ember">Admin</p>
           <h1 className="mt-3 text-4xl font-bold text-white">Posts</h1>
           <p className="mt-3 text-paper/62">{message}</p>
         </div>

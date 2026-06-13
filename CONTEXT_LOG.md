@@ -18,10 +18,11 @@
 - 2026-06-13: First Cloudflare Pages deployment failed because Pages config validation rejects Worker-only `observability` in `wrangler.jsonc`; removed that field and documented the constraint.
 - 2026-06-13: Cloudflare Pages preview deployment `a4f8045b` and production deployment `f85c7773` succeeded after the config fix. Verified `https://elvhack.pages.dev/` returns 200 and `https://elvhack.pages.dev/api/posts` returns the expected structured Supabase configuration error until real credentials are set.
 - 2026-06-13: Bound Cloudflare-hosted apex domain `elvhack.com` to the Cloudflare Pages project `elvhack`. Created proxied apex CNAME `elvhack.com -> elvhack.pages.dev`. Verified `https://elvhack.com/` returns 200 with the deployed SPA and `http://elvhack.com/` redirects to HTTPS. Cloudflare Pages custom domain API still reports certificate validation as `pending`, while domain ownership verification is `active` and public HTTPS is serving correctly.
+- 2026-06-13: Refreshed the homepage into a stronger visual-first edge signal board. The first viewport now loads featured posts from `/api/posts` when Supabase-backed API data is available and keeps local fallback posts when the API is offline or unconfigured. Fixed Tailwind CSS v4 setup by switching `src/styles.css` to the CSS-first `@import "tailwindcss"` entry with explicit source scanning; this restored complete production utility generation. Verified desktop and mobile homepage layout in the in-app browser with no horizontal overflow. Re-ran `npm run typecheck`, `npm run lint`, `npm run test`, and `npm run build` successfully with the bundled Node/npm shim.
 
 ## Todo
 
-- Add real Supabase project credentials to `.env.local` and Cloudflare Pages environment variables.
+- Add real Supabase project credentials to `.env.local` and Cloudflare Pages environment variables. Current production `/api/posts` returns structured `UPSTREAM_ERROR` / `Supabase service configuration is missing.` until `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` are configured.
 - Apply Supabase migration `20260613000000_initial_elvhack_cms.sql` to the target Supabase project.
 - Trigger and inspect the first Cloudflare Pages deployment after environment variables are configured.
 - Recheck Cloudflare Pages custom domain status until `elvhack.com` control-plane validation changes from `pending` to active.

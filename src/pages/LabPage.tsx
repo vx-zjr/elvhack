@@ -10,7 +10,7 @@ const experiments = [
 export function LabPage() {
   return (
     <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-      <p className="font-mono text-sm uppercase tracking-[0.24em] text-ember">Experiments</p>
+      <p className="font-mono text-sm uppercase text-ember">Experiments</p>
       <h1 className="mt-3 text-4xl font-bold text-white sm:text-5xl">Lab</h1>
       <div className="mt-10 grid gap-4 md:grid-cols-2">
         {experiments.map((item) => {

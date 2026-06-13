@@ -56,7 +56,7 @@ export function BlogPostPage() {
 
   return (
     <article className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
-      <p className="font-mono text-sm uppercase tracking-[0.22em] text-signal">{post.status}</p>
+      <p className="font-mono text-sm uppercase text-signal">{post.status}</p>
       <h1 className="mt-4 text-4xl font-black leading-tight text-white sm:text-6xl">{post.title}</h1>
       <p className="mt-5 text-lg leading-8 text-paper/70">{post.excerpt}</p>
       <div className="prose-lite mt-10 rounded-md border border-white/10 bg-white/[0.045] p-6 sm:p-8">{renderMarkdown(post.content)}</div>

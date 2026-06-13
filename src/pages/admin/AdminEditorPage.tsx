@@ -28,7 +28,7 @@ export function AdminEditorPage() {
   return (
     <section className="mx-auto grid max-w-7xl gap-6 px-4 py-16 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:px-8">
       <div className="rounded-md border border-white/10 bg-white/[0.045] p-5">
-        <p className="font-mono text-sm uppercase tracking-[0.24em] text-ember">Editor</p>
+        <p className="font-mono text-sm uppercase text-ember">Editor</p>
         <input value={title} onChange={(event) => setTitle(event.target.value)} className="mt-4 w-full rounded-md border border-white/10 bg-ink/70 p-3 text-2xl font-bold text-white outline-none focus:border-signal" />
         <textarea value={excerpt} onChange={(event) => setExcerpt(event.target.value)} className="mt-3 min-h-24 w-full rounded-md border border-white/10 bg-ink/70 p-3 text-sm text-white outline-none focus:border-signal" />
         <textarea value={content} onChange={(event) => setContent(event.target.value)} className="mt-3 min-h-[28rem] w-full rounded-md border border-white/10 bg-ink/70 p-3 font-mono text-sm text-white outline-none focus:border-signal" />
@@ -45,7 +45,7 @@ export function AdminEditorPage() {
         <p className="mt-4 text-sm text-paper/60">{message}</p>
       </div>
       <aside className="rounded-md border border-white/10 bg-paper p-5 text-ink">
-        <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-ember">
+        <div className="flex items-center gap-2 text-sm font-semibold uppercase text-ember">
           <Eye size={16} aria-hidden="true" />
           Preview
         </div>

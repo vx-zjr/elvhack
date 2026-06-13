@@ -20,7 +20,7 @@ export function SiteLayout() {
     <div className="min-h-screen text-paper">
       <header className="fixed inset-x-0 top-0 z-30 border-b border-white/10 bg-ink/82 backdrop-blur-xl">
         <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8" aria-label="Primary">
-          <Link to="/" className="flex items-center gap-3 text-sm font-semibold tracking-[0.14em] text-white">
+          <Link to="/" className="flex items-center gap-3 text-sm font-semibold text-white">
             <span className="grid h-9 w-9 place-items-center rounded-md border border-signal/40 bg-signal/12 text-signal">
               <PenTool size={18} aria-hidden="true" />
             </span>

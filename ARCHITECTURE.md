@@ -32,7 +32,7 @@ Edge constraints:
 
 ## 3. Frontend Route Tree
 
-- `/` - immersive homepage, featured writing, lab highlights, status cards.
+- `/` - immersive homepage, live `/api/posts` featured writing with local fallback, lab highlights, status cards.
 - `/blog` - searchable public post index.
 - `/blog/:slug` - article detail with comments and reactions.
 - `/lab` - technical experiments and edge architecture showcase.
@@ -97,6 +97,8 @@ npx wrangler pages dev dist --compatibility-date 2026-06-13
 ```
 
 When the local system lacks `npm`, use the Codex bundled Node/npm shim already prepared under `work/npm-cli` during this rebuild session.
+
+Tailwind CSS uses the v4 CSS-first entry in `src/styles.css` with explicit `@source` declarations for `index.html` and `src/**/*.{ts,tsx}`. Keep theme tokens there so production builds include all utility classes used by the React routes.
 
 ## 7. Development Memory Lifecycle
 
